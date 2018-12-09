@@ -18,7 +18,22 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        if (animator.GetCurrentAnimatorStateInfo(0).IsTag("handsUp"))
+        {
+            animator.SetBool("HandsUp", false);
+        }
+        if (animator.GetCurrentAnimatorStateInfo(0).IsTag("spear"))
+        {
+            animator.SetBool("spear", false);
+        }
+        if (animator.GetCurrentAnimatorStateInfo(0).IsTag("sword"))
+        {
+            animator.SetBool("sword", false);
+        }
+        if (animator.GetCurrentAnimatorStateInfo(0).IsTag("bow"))
+        {
+            animator.SetBool("bow", false);
+        }
         if (!isLocked)
         {
             float horizontalInput = Input.GetAxis("Horizontal");
@@ -61,4 +76,35 @@ public class PlayerController : MonoBehaviour
     {
         isLocked = false;
     }
+
+
+    public void spear(float Xspeed, float Yspeed)
+    {
+        animator.SetBool("spear", true);
+        animator.SetFloat("XSpeed", Xspeed);
+        animator.SetFloat("YSpeed", Yspeed);
+    }
+
+    public void handsUp(float Xspeed, float Yspeed)
+    {
+        animator.SetBool("HandsUp", true);
+        animator.SetFloat("XSpeed", Xspeed);
+        animator.SetFloat("YSpeed", Yspeed);
+    }
+
+
+    public void sword(float Xspeed, float Yspeed)
+    {
+        animator.SetBool("sword", true);
+        animator.SetFloat("XSpeed", Xspeed);
+        animator.SetFloat("YSpeed", Yspeed);
+    }
+
+    public void bow(float Xspeed, float Yspeed)
+    {
+        animator.SetBool("sword", true);
+        animator.SetFloat("XSpeed", Xspeed);
+        animator.SetFloat("YSpeed", Yspeed);
+    }
+
 }

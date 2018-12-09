@@ -31,7 +31,6 @@ public class AnimationCharacter : MonoBehaviour
         AnimatorOverrideController animOveride;
 
         //on crée tous les clips nécessaire
-        //AnimationClip Dead = createClipAnimation(10, 50, 0.1f, "Dead");
         AnimationClip Dead = createClipAnimation(172, 177, 0.1f, "Dead");
         AnimationClip IdleRight = createClipAnimation(87, 87, 0.1f, "IdleRight");
         AnimationClip walkRight = createClipAnimation(88, 95, 0.1f, "walkRight");
@@ -42,16 +41,31 @@ public class AnimationCharacter : MonoBehaviour
         AnimationClip IdleDown = createClipAnimation(78, 78, 0.1f, "IdleDown");
         AnimationClip walkDown = createClipAnimation(79, 86, 0.1f, "walkDown");
         AnimationClip transition = createClipAnimation(0, -1, 0.1f, "Transition");
+        AnimationClip handsUpDown = createClipAnimation(15, 20, 0.1f, "handsUpDown");
+        AnimationClip handsUpUp = createClipAnimation(1, 6, 0.1f, "handsUpUp");
+        AnimationClip handsUpLeft = createClipAnimation(8, 13, 0.1f, "handsUpLeft");
+        AnimationClip handsUpRight = createClipAnimation(22, 27, 0.1f, "handsUpRight");
+        AnimationClip spearDown = createClipAnimation(45, 51, 0.1f, "spearDown");
+        AnimationClip spearUp = createClipAnimation(29, 35, 0.1f, "spearUp");
+        AnimationClip spearLeft = createClipAnimation(37, 43, 0.1f, "spearLeft");
+        AnimationClip spearRight = createClipAnimation(53, 59, 0.1f, "spearRight");
+        AnimationClip swordDown = createClipAnimation(109, 113, 0.1f, "swordDown");
+        AnimationClip swordUp = createClipAnimation(97, 101, 0.1f, "swordUp");
+        AnimationClip swordLeft = createClipAnimation(103, 107, 0.1f, "swordLeft");
+        AnimationClip swordRight = createClipAnimation(115, 119, 0.1f, "swordRight");
+        AnimationClip bowDown = createClipAnimation(147, 158, 0.1f, "bowDown");
+        AnimationClip bowUp = createClipAnimation(121, 132, 0.1f, "bowUp");
+        AnimationClip bowLeft = createClipAnimation(134, 145, 0.1f, "bowLeft");
+        AnimationClip bowRight = createClipAnimation(160, 171, 0.1f, "bowRight");
 
         var anims = new List<KeyValuePair<AnimationClip, AnimationClip>>();
         animOveride = new AnimatorOverrideController(anim.runtimeAnimatorController);
-        //animOveride.runtimeAnimatorController = anim.runtimeAnimatorController;
 
         //on modifie toutes les animations
         //WARNING: SI UNE SEULE ANIMATION N'EST PAS MODIFIE L'ANIMATOR VA BUGER ET LES ANIMATIONS MODIFIE NE VONT PAS SE JOUER
         foreach (var a in animOveride.animationClips)
         {
-            Debug.Log(clipsDict[a.name].wrapMode);
+            Debug.Log(a.name);
             anims.Add(new KeyValuePair<AnimationClip, AnimationClip>(a, clipsDict[a.name]));
         }
 
