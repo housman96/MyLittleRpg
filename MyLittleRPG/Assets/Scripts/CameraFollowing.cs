@@ -14,7 +14,7 @@ public class CameraFollowing : MonoBehaviour
     void Update()
     {
         Vector3 v = followed.transform.position;
-        v.z = -2;
+        v.z = -10;
         transform.position = v;
 
     }
