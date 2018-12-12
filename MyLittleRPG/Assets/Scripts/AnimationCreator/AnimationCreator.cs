@@ -1,27 +1,40 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 
-public abstract class AnimationCreator : MonoBehaviour
+public class AnimationCreator : MonoBehaviour
 {
 
-    public string textureName;
+    public Texture2D texture;
     protected Sprite[] sprite = new Sprite[273];
     protected Dictionary<string, AnimationClip> clipsDict = new Dictionary<string, AnimationClip>();
 
     // Use this for initialization
     void Start()
     {
-        getTextures(textureName);
-        setFrame(getNumber(6, 0));
+        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetDatabase.GetAssetPath(texture));
+        Debug.Log(AssetDatabase.GetAssetPath(texture));
+        int j = 0;
+        for (int i = 0; i < spriteTemp.Length; i++)
+        {
+            if (spriteTemp[i].name.IndexOf(texture.name) != -1)
+            {
+                Debug.Log(spriteTemp[i].name);
+                sprite[j] = (Sprite)spriteTemp[i];
+                j++;
+            }
+
+        }
+        Directory.CreateDirectory(Application.dataPath + "/" + name);
         createAnimation();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
     }
-
-
-    public abstract void getTextures(string nameTexture);
 
     public int getNumber(int row, int col)
     {
-        return (20 - row) * 13 + col;
+        return row * 13 + col;
     }
 
 
@@ -71,7 +84,7 @@ public abstract class AnimationCreator : MonoBehaviour
         AnimationClip Dead = createClipAnimation(getNumber(20, 1), getNumber(20, 5), 0.1f, "Dead");
 
         //Transition
-        AnimationClip transition = createClipAnimation(-1, -1, 0.1f, "Transition");
+        AnimationClip transition = createClipAnimation(0, -1, 0.1f, "Transition");
 
 
         var anims = new List<KeyValuePair<AnimationClip, AnimationClip>>();
@@ -88,7 +101,15 @@ public abstract class AnimationCreator : MonoBehaviour
         animOveride.ApplyOverrides(anims);
         anim.runtimeAnimatorController = animOveride;
         anim.runtimeAnimatorController.name = "newAnimation";
+        AssetDatabase.CreateAsset(animOveride, "Assets/" + name + "/" + name + "Controller.overrideController");
 
+
+        GameObject obj = new GameObject();
+        Animator animObj = obj.AddComponent<Animator>();
+        obj.AddComponent<SpriteRenderer>().sprite = sprite[78];
+        animObj.runtimeAnimatorController = animOveride;
+        Object prefab = PrefabUtility.CreatePrefab("Assets/" + name + "Object.prefab", obj);
+        PrefabUtility.ReplacePrefab(obj, prefab, ReplacePrefabOptions.ConnectToPrefab);
     }
 
 
@@ -99,26 +120,28 @@ public abstract class AnimationCreator : MonoBehaviour
     public AnimationClip createClipAnimation(int deb = 0, int fin = 0, float refreshRate = 0.1f, string nameClip = "Unnamed")
     {
         AnimationClip clip = new AnimationClip();
+        EditorCurveBinding spriteBinding = new EditorCurveBinding();
+        spriteBinding.type = typeof(SpriteRenderer);
+        spriteBinding.path = "";
+        spriteBinding.propertyName = "m_Sprite";
+        ObjectReferenceKeyframe[] spriteKeyFrames = new ObjectReferenceKeyframe[fin + 1 - deb];
         //on ajoute une par une chaque image dans l'animation
         for (int i = deb; i < fin + 1; i++)
         {
-            AnimationEvent eventAnim = new AnimationEvent();
-            eventAnim.intParameter = i;
-            eventAnim.time = refreshRate * (i - deb);
-            eventAnim.functionName = "setFrame";
-            clip.AddEvent(eventAnim);
+            spriteKeyFrames[i - deb] = new ObjectReferenceKeyframe();
+            spriteKeyFrames[i - deb].time = refreshRate * (i - deb);
+            spriteKeyFrames[i - deb].value = sprite[i];
         }
-
         clip.frameRate = 14;
         clip.name = nameClip;
         clip.wrapMode = WrapMode.Loop;
+
+        AnimationUtility.SetObjectReferenceCurve(clip, spriteBinding, spriteKeyFrames);
         clipsDict.Add(clip.name, clip);
+        AssetDatabase.CreateAsset(clip, "Assets/" + name + "/" + nameClip + ".anim");
+
 
         return clip;
     }
 
-    public void setFrame(int i = 0)
-    {
-        GetComponent<SpriteRenderer>().sprite = sprite[i];
-    }
 }
