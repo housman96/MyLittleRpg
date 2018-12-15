@@ -8,6 +8,8 @@ public class SpriteProcessor : AssetPostprocessor
 
     void OnPreprocessTexture()
     {
+        //on set les paramètres du textureImporter
+
         TextureImporter textureImporter = (TextureImporter)assetImporter;
         textureImporter.textureType = TextureImporterType.Sprite;
         textureImporter.spriteImportMode = SpriteImportMode.Multiple;
@@ -18,8 +20,11 @@ public class SpriteProcessor : AssetPostprocessor
 
     public void OnPostprocessTexture(Texture2D texture)
     {
+        //on ne découpe que les textures qui sont dans le bon dossier
         if (assetPath.IndexOf("/TextureCharacter/") == -1)
             return;
+
+        //on découpe la texture uniquement si elle n'est pas découpée 
         TextureImporter textureImporter = (TextureImporter)assetImporter;
         if (textureImporter.spritesheet.Length == 0)
         {
@@ -39,7 +44,6 @@ public class SpriteProcessor : AssetPostprocessor
                     metas.Add(meta);
                 }
             }
-
             textureImporter.spritesheet = metas.ToArray();
             AssetDatabase.Refresh();
         }
@@ -47,40 +51,46 @@ public class SpriteProcessor : AssetPostprocessor
 
     public void OnPostprocessSprites(Texture2D texture, Sprite[] sprite)
     {
+        //on importe les sprite uniquement si on a déjà refersh
         if (sprite.Length == 0)
         {
             return;
         }
-        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
 
+        //si les sprites n'ont pas encore été sauvegardé on les saves
+        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
         if (spriteTemp.Length == 0)
         {
             assetImporter.SaveAndReimport();
         }
         else
         {
-            string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
-            Sprite[] sprites = new Sprite[273];
-            int j = 0;
-            for (int i = 0; i < spriteTemp.Length; i++)
+            //si la texture à la bonne taille
+            if (spriteTemp.Length == 273)
             {
-                if (spriteTemp[i].name.IndexOf(nameTexture) != -1)
+                //on transforme tous les objets en sprites
+
+                Sprite[] sprites = new Sprite[273];
+                for (int i = 0; i < spriteTemp.Length; i++)
                 {
-                    sprites[j] = (Sprite)spriteTemp[i];
-                    j++;
+                    sprites[i] = (Sprite)spriteTemp[i];
                 }
 
-            }
-            if (j == 273)
-            {
+                //on crée tous les path utiles à la création des sprites
+
+                string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
                 string pathFolderAnimation = (assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length) + "/").Insert("Assets".Length, "/Animation");
                 string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length).Insert("Assets".Length, "/Prefab");
                 string RelativePathFolderGameObject = Application.dataPath.Remove(Application.dataPath.Length - "Assets".Length) + pathFolderAnimation;
                 string RelativePathFolderAnimation = Application.dataPath.Remove(Application.dataPath.Length - "Assets".Length) + pathGameObject;
 
+                //on crée les folders où on va ranger les animations et les gameObjects
                 Directory.CreateDirectory(RelativePathFolderGameObject);
                 Directory.CreateDirectory(RelativePathFolderAnimation);
+
                 createAnimation(sprites, pathFolderAnimation, pathGameObject, nameTexture);
+
+                //on save les changements
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
@@ -154,13 +164,17 @@ public class SpriteProcessor : AssetPostprocessor
 
 
 
-
+        //on crée le gameObject de la texture
         GameObject obj = new GameObject();
         Animator animObj = obj.AddComponent<Animator>();
         obj.AddComponent<SpriteRenderer>().sprite = sprite[78];
         animObj.runtimeAnimatorController = animOveride;
+
+        //on save la texture du GameObject
         Object prefab = PrefabUtility.CreatePrefab(pathGameObject + name + "Object.prefab", obj);
         PrefabUtility.ReplacePrefab(obj, prefab, ReplacePrefabOptions.ConnectToPrefab);
+
+        //on détruit l'object créé
         Object.DestroyImmediate(obj);
     }
 
@@ -177,7 +191,6 @@ public class SpriteProcessor : AssetPostprocessor
         //on ajoute une par une chaque image dans l'animation
         for (int i = deb; i < fin + 1; i++)
         {
-
             spriteKeyFrames[i - deb] = new ObjectReferenceKeyframe();
             spriteKeyFrames[i - deb].time = refreshRate * (i - deb);
             spriteKeyFrames[i - deb].value = sprite[i];
