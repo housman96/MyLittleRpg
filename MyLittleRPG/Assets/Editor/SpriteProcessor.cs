@@ -20,56 +20,71 @@ public class SpriteProcessor : AssetPostprocessor
     {
         if (assetPath.IndexOf("/TextureCharacter/") == -1)
             return;
-
-        int spriteSize = 64;
-        int colCount = texture.width / spriteSize;
-        int rowCount = texture.height / spriteSize;
-        string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
-        List<SpriteMetaData> metas = new List<SpriteMetaData>();
-
-        for (int r = 0; r < rowCount; ++r)
-        {
-            for (int c = 0; c < colCount; ++c)
-            {
-                SpriteMetaData meta = new SpriteMetaData();
-                meta.rect = new Rect(c * spriteSize, r * spriteSize, spriteSize, spriteSize);
-                meta.name = nameTexture + "_" + ((rowCount - 1 - r) * colCount + c);
-                metas.Add(meta);
-            }
-        }
         TextureImporter textureImporter = (TextureImporter)assetImporter;
-        textureImporter.spritesheet = metas.ToArray();
-        AssetDatabase.Refresh();
-
-
-        string RelativePathFolder = Application.dataPath.Remove(Application.dataPath.Length - 6) + assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length);
-        string pathFolderAnimation = assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length) + "/";
-        string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length);
-
-
-        Sprite[] sprites = new Sprite[273];
-        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
-        int j = 0;
-        for (int i = 0; i < spriteTemp.Length; i++)
+        if (textureImporter.spritesheet.Length == 0)
         {
-            if (spriteTemp[i].name.IndexOf(Path.GetFileNameWithoutExtension(assetPath)) != -1)
+            int spriteSize = 64;
+            int colCount = texture.width / spriteSize;
+            int rowCount = texture.height / spriteSize;
+            string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
+            List<SpriteMetaData> metas = new List<SpriteMetaData>();
+
+            for (int r = 0; r < rowCount; ++r)
             {
-                sprites[j] = (Sprite)spriteTemp[i];
-                j++;
+                for (int c = 0; c < colCount; ++c)
+                {
+                    SpriteMetaData meta = new SpriteMetaData();
+                    meta.rect = new Rect(c * spriteSize, r * spriteSize, spriteSize, spriteSize);
+                    meta.name = nameTexture + "_" + ((rowCount - 1 - r) * colCount + c);
+                    metas.Add(meta);
+                }
             }
 
+            textureImporter.spritesheet = metas.ToArray();
+            AssetDatabase.Refresh();
         }
-
-
-        Directory.CreateDirectory(RelativePathFolder);
-        createAnimation(sprites, pathFolderAnimation, pathGameObject, nameTexture);
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
     }
 
-    public void OnPostprocessSprites(Texture2D texture, Sprite[] sprites)
+    public void OnPostprocessSprites(Texture2D texture, Sprite[] sprite)
     {
+        if (sprite.Length == 0)
+        {
+            return;
+        }
+        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
 
+        if (spriteTemp.Length == 0)
+        {
+            assetImporter.SaveAndReimport();
+        }
+        else
+        {
+            string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
+            Sprite[] sprites = new Sprite[273];
+            int j = 0;
+            for (int i = 0; i < spriteTemp.Length; i++)
+            {
+                if (spriteTemp[i].name.IndexOf(nameTexture) != -1)
+                {
+                    sprites[j] = (Sprite)spriteTemp[i];
+                    j++;
+                }
+
+            }
+            if (j == 273)
+            {
+                string pathFolderAnimation = (assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length) + "/").Insert("Assets".Length, "/Animation");
+                string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length).Insert("Assets".Length, "/Prefab");
+                string RelativePathFolderGameObject = Application.dataPath.Remove(Application.dataPath.Length - "Assets".Length) + pathFolderAnimation;
+                string RelativePathFolderAnimation = Application.dataPath.Remove(Application.dataPath.Length - "Assets".Length) + pathGameObject;
+
+                Directory.CreateDirectory(RelativePathFolderGameObject);
+                Directory.CreateDirectory(RelativePathFolderAnimation);
+                createAnimation(sprites, pathFolderAnimation, pathGameObject, nameTexture);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+        }
     }
 
 
@@ -174,8 +189,6 @@ public class SpriteProcessor : AssetPostprocessor
         AnimationUtility.SetObjectReferenceCurve(clip, spriteBinding, spriteKeyFrames);
         clipsDict.Add(clip.name, clip);
         AssetDatabase.CreateAsset(clip, path + nameClip + ".anim");
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
 
         return clipsDict;
     }
