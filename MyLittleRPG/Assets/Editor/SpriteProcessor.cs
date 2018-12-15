@@ -24,6 +24,7 @@ public class SpriteProcessor : AssetPostprocessor
         int spriteSize = 64;
         int colCount = texture.width / spriteSize;
         int rowCount = texture.height / spriteSize;
+        string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
         List<SpriteMetaData> metas = new List<SpriteMetaData>();
 
         for (int r = 0; r < rowCount; ++r)
@@ -32,7 +33,7 @@ public class SpriteProcessor : AssetPostprocessor
             {
                 SpriteMetaData meta = new SpriteMetaData();
                 meta.rect = new Rect(c * spriteSize, r * spriteSize, spriteSize, spriteSize);
-                meta.name = Path.GetFileNameWithoutExtension(assetPath) + "_" + ((rowCount - 1 - r) * colCount + c);
+                meta.name = nameTexture + "_" + ((rowCount - 1 - r) * colCount + c);
                 metas.Add(meta);
             }
         }
@@ -41,30 +42,42 @@ public class SpriteProcessor : AssetPostprocessor
         AssetDatabase.Refresh();
 
 
-        string pathFolder = Application.dataPath.Remove(Application.dataPath.Length - 6) + assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length);
-        string path = assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length);
-        //Debug.Log(path);
-        Directory.CreateDirectory(pathFolder);
-        createAnimation(Path.GetFileNameWithoutExtension(assetPath), path + "/", path.Remove(path.Length - Path.GetFileNameWithoutExtension(assetPath).Length), Path.GetFileNameWithoutExtension(assetPath));
+        string RelativePathFolder = Application.dataPath.Remove(Application.dataPath.Length - 6) + assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length);
+        string pathFolderAnimation = assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length) + "/";
+        string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length);
+
+
+        Sprite[] sprites = new Sprite[273];
+        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
+        int j = 0;
+        for (int i = 0; i < spriteTemp.Length; i++)
+        {
+            if (spriteTemp[i].name.IndexOf(Path.GetFileNameWithoutExtension(assetPath)) != -1)
+            {
+                sprites[j] = (Sprite)spriteTemp[i];
+                j++;
+            }
+
+        }
+
+
+        Directory.CreateDirectory(RelativePathFolder);
+        createAnimation(sprites, pathFolderAnimation, pathGameObject, nameTexture);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
     }
 
     public void OnPostprocessSprites(Texture2D texture, Sprite[] sprites)
     {
-        //Debug.Log("Sprites: " + sprites.Length);
+
     }
 
 
-    public void createAnimation(string sprite, string path, string pathGameObject, string name)
+    public void createAnimation(Sprite[] sprite, string path, string pathGameObject, string name)
     {
         AnimatorOverrideController animOveride = new AnimatorOverrideController(AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>("Assets/Animation/Character/overrideCharacterAnimator.overrideController"));
         Dictionary<string, AnimationClip> clipsDict = new Dictionary<string, AnimationClip>();
 
-        if (animOveride == null)
-        {
-            Debug.Log("error");
-        }
         //on crée tous les clips nécessaire
         //handsup
         clipsDict = createClipAnimation(clipsDict, sprite, getNumber(0, 1), getNumber(0, 6), 0.1f, "handsUpUp", path);
@@ -91,15 +104,15 @@ public class SpriteProcessor : AssetPostprocessor
         clipsDict = createClipAnimation(clipsDict, sprite, getNumber(11, 0), getNumber(11, 0), 0.1f, "IdleRight", path);
 
         //sword
-        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(12, 1), getNumber(12, 5), 0.1f, "swordDown", path);
-        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(13, 1), getNumber(13, 5), 0.1f, "swordUp", path);
-        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(14, 1), getNumber(14, 5), 0.1f, "swordLeft", path);
+        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(12, 1), getNumber(12, 5), 0.1f, "swordUp", path);
+        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(13, 1), getNumber(13, 5), 0.1f, "swordLeft", path);
+        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(14, 1), getNumber(14, 5), 0.1f, "swordDown", path);
         clipsDict = createClipAnimation(clipsDict, sprite, getNumber(15, 1), getNumber(15, 5), 0.1f, "swordRight", path);
 
         //bow
-        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(16, 1), getNumber(16, 12), 0.1f, "bowDown", path);
-        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(17, 1), getNumber(17, 12), 0.1f, "bowUp", path);
-        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(18, 1), getNumber(18, 12), 0.1f, "bowLeft", path);
+        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(16, 1), getNumber(16, 12), 0.1f, "bowUp", path);
+        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(17, 1), getNumber(17, 12), 0.1f, "bowLeft", path);
+        clipsDict = createClipAnimation(clipsDict, sprite, getNumber(18, 1), getNumber(18, 12), 0.1f, "bowDown", path);
         clipsDict = createClipAnimation(clipsDict, sprite, getNumber(19, 1), getNumber(19, 12), 0.1f, "bowRight", path);
 
         //Dead
@@ -124,30 +137,19 @@ public class SpriteProcessor : AssetPostprocessor
         AssetDatabase.CreateAsset(animOveride, path + name + "Controller.overrideController");
 
 
-        Sprite[] sprites = new Sprite[273];
-        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(path.Remove(path.Length - 1) + ".png");
-        int j = 0;
-        for (int i = 0; i < spriteTemp.Length; i++)
-        {
-            if (spriteTemp[i].name.IndexOf(sprite) != -1)
-            {
-                sprites[j] = (Sprite)spriteTemp[i];
-                j++;
-            }
 
-        }
 
 
         GameObject obj = new GameObject();
         Animator animObj = obj.AddComponent<Animator>();
-        obj.AddComponent<SpriteRenderer>().sprite = sprites[78];
+        obj.AddComponent<SpriteRenderer>().sprite = sprite[78];
         animObj.runtimeAnimatorController = animOveride;
         Object prefab = PrefabUtility.CreatePrefab(pathGameObject + name + "Object.prefab", obj);
         PrefabUtility.ReplacePrefab(obj, prefab, ReplacePrefabOptions.ConnectToPrefab);
         Object.DestroyImmediate(obj);
     }
 
-    public Dictionary<string, AnimationClip> createClipAnimation(Dictionary<string, AnimationClip> clipsDict, string name, int deb = 0, int fin = 0, float refreshRate = 0.1f, string nameClip = "Unnamed", string path = "")
+    public Dictionary<string, AnimationClip> createClipAnimation(Dictionary<string, AnimationClip> clipsDict, Sprite[] sprite, int deb = 0, int fin = 0, float refreshRate = 0.1f, string nameClip = "Unnamed", string path = "")
     {
         AnimationClip clip = new AnimationClip();
         EditorCurveBinding spriteBinding = new EditorCurveBinding();
@@ -157,23 +159,6 @@ public class SpriteProcessor : AssetPostprocessor
         ObjectReferenceKeyframe[] spriteKeyFrames = new ObjectReferenceKeyframe[fin + 1 - deb];
 
 
-        Sprite[] sprite = new Sprite[273];
-        var spriteTemp = AssetDatabase.LoadAllAssetRepresentationsAtPath(path.Remove(path.Length - 1) + ".png");
-        int j = 0;
-        for (int i = 0; i < spriteTemp.Length; i++)
-        {
-            if (spriteTemp[i].name.IndexOf(name) != -1)
-            {
-                sprite[j] = (Sprite)spriteTemp[i];
-                j++;
-            }
-
-        }
-        if (sprite[0] == null)
-        {
-            Debug.Log(name);
-            Debug.Log(path.Remove(path.Length - 1) + ".png");
-        }
         //on ajoute une par une chaque image dans l'animation
         for (int i = deb; i < fin + 1; i++)
         {
