@@ -61,8 +61,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\AnimationCreator\AnimationCreator.cs" />
     <Compile Include="Assets\Scripts\CameraFollowing.cs" />
+    <Compile Include="Assets\Scripts\Player\Attacks.cs" />
+    <Compile Include="Assets\Scripts\Player\CharacterStats.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>D:/GameWork/MyLittleRpg/MyLittleRPG/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
