@@ -9,7 +9,8 @@ public class SpriteProcessor : AssetPostprocessor
     void OnPreprocessTexture()
     {
         //on set les paramètres du textureImporter
-
+        if (assetPath.IndexOf("/TextureCharacter/") == -1)
+            return;
         TextureImporter textureImporter = (TextureImporter)assetImporter;
         textureImporter.textureType = TextureImporterType.Sprite;
         textureImporter.spriteImportMode = SpriteImportMode.Multiple;
@@ -23,6 +24,7 @@ public class SpriteProcessor : AssetPostprocessor
         //on ne découpe que les textures qui sont dans le bon dossier
         if (assetPath.IndexOf("/TextureCharacter/") == -1)
             return;
+
 
         //on découpe la texture uniquement si elle n'est pas découpée 
         TextureImporter textureImporter = (TextureImporter)assetImporter;

@@ -27,6 +27,9 @@ public class CharacterStats : MonoBehaviour
     public Attacks attack3;
     public Attacks attack4;
 
+    //test
+    public CharacterStats other;
+
     // Use this for initialization
     void Start()
     {
@@ -34,8 +37,12 @@ public class CharacterStats : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-
+        //test de la methode à enlever
+        if (Input.GetButtonDown("e") && name == "ElBlanco")
+        {
+            attack1.launchAttack(this, other);
+        }
     }
 }
