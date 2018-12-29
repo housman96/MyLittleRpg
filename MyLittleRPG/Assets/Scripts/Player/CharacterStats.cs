@@ -22,27 +22,33 @@ public class CharacterStats : MonoBehaviour
     public int currentPV;
 
     //Attacks
-    public Attacks attack1;
-    public Attacks attack2;
-    public Attacks attack3;
-    public Attacks attack4;
+    public ScriptableAttacks attack1;
+    public ScriptableAttacks attack2;
+    public ScriptableAttacks attack3;
+    public ScriptableAttacks attack4;
 
     //test
     public CharacterStats other;
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (currentPV <= 0)
+        {
+            GetComponent<CharacterController>().dead();
+        }
+
         //test de la methode à enlever
         if (Input.GetButtonDown("e") && name == "ElBlanco")
         {
             attack1.launchAttack(this, other);
         }
+    }
+
+
+    public void hurted(int dgts)
+    {
+        currentPV -= dgts;
+        StartCoroutine(GetComponent<CharacterController>().hurted());
     }
 }

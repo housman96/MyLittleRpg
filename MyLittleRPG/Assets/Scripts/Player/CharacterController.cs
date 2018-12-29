@@ -1,28 +1,37 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
-public enum Sens { Up, Down, Left, Right }
+public enum Sens { Down, Up, Left, Right }
 
 public class CharacterController : MonoBehaviour
 {
 
 
 
-    public bool isPlayer = false;
+
     public float speed;
+    public GameObject Layers;
+    public Sens sens = Sens.Down;
 
     private Animator[] animators;
     private SpriteRenderer spriteRenderer;
+    private float animationDuration;
     private Vector3 targetAnimation;
+
+    //boolean utilisé pour savoir si on doit lancer une animation
+    public bool isPlayer = false;
     private bool isInAnimation = false;
     private bool isLocked = false;
     private bool isMoving = false;
+    private bool isDisplayed = true;
+    private bool isDead = false;
 
     void Awake()
     {
-        //on récupére tous les animators des enfants
+        //on récupére tous les animators des enfants dans l'objet Layers
         int i = 0;
-        animators = new Animator[transform.childCount];
-        foreach (Transform child in transform)
+        animators = new Animator[Layers.transform.childCount];
+        foreach (Transform child in Layers.transform)
         {
             animators[i] = child.GetComponent<Animator>();
             i++;
@@ -39,17 +48,43 @@ public class CharacterController : MonoBehaviour
             //pour tous les animators
             foreach (Animator animator in animators)
             {
+                //si on est mort on lance l'animation de mort
+                if (isDead)
+                {
+                    animator.SetBool("Dead", true);
+                }
+
+                //si on doit afficher le personnage
+                if (isDisplayed)
+                {
+                    animator.GetComponent<SpriteRenderer>().enabled = true;
+                }
+                else
+                {
+                    animator.GetComponent<SpriteRenderer>().enabled = false;
+                }
+
                 //si on est dans une animation
                 if (isInAnimation)
                 {
-                    //on déplace le personnage vers targetAnimation en 2 secondes
-                    float speedAnimation = Vector3.Distance(transform.position, targetAnimation) / 2;
+                    //on déplace le personnage vers targetAnimation en animationDuration secondes
+                    float speedAnimation = Vector3.Distance(transform.position, targetAnimation) / animationDuration;
                     float step = speedAnimation * Time.deltaTime;
+
+                    if (!isLocked)
+                    {
+                        animator.SetBool("isMoving", isMoving);
+                        animator.SetFloat("XSpeed", Vector3.MoveTowards(transform.position, targetAnimation, step).x);
+                        animator.SetFloat("YSpeed", Vector3.MoveTowards(transform.position, targetAnimation, step).y);
+                    }
+
                     transform.position = Vector3.MoveTowards(transform.position, targetAnimation, step);
                     if (transform.position == targetAnimation)
                     {
                         isInAnimation = false;
                     }
+
+
                 }
 
                 //si on est dans une animation d'attaque on désactive le boolean qui declenche l'animation d'attaque
@@ -98,6 +133,33 @@ public class CharacterController : MonoBehaviour
                         animator.SetBool("isMoving", isMoving);
                         animator.SetFloat("XSpeed", horizontalInput);
                         animator.SetFloat("YSpeed", verticalInput);
+                        if (horizontalInput != 0 || verticalInput != 0)
+                        {
+                            if (horizontalInput * horizontalInput > verticalInput * verticalInput)
+                            {
+                                if (horizontalInput > 0)
+                                {
+
+                                    sens = Sens.Right;
+                                }
+                                else
+                                {
+                                    sens = Sens.Left;
+                                }
+                            }
+                            else
+                            {
+                                if (verticalInput > 0)
+                                {
+                                    sens = Sens.Up;
+                                }
+                                else
+                                {
+                                    sens = Sens.Down;
+                                }
+                            }
+
+                        }
 
                         //on bouge le personnage
                         transform.Translate(translation);
@@ -169,8 +231,9 @@ public class CharacterController : MonoBehaviour
     }
 
     //animation de marche jusqu'au point v
-    public void moveToward(Vector3 v)
+    public void moveToward(Vector3 v, float time)
     {
+        animationDuration = time;
         isInAnimation = true;
         targetAnimation = v;
     }
@@ -204,6 +267,29 @@ public class CharacterController : MonoBehaviour
             animator.SetBool("isMoving", false);
             animator.SetFloat("XSpeed", Xspeed);
             animator.SetFloat("YSpeed", Yspeed);
+        }
+    }
+
+    //lance l'animation de blessure
+    public IEnumerator hurted()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            yield return new WaitForSeconds(0.1f);
+            isDisplayed = false;
+            yield return new WaitForSeconds(0.1f);
+            isDisplayed = true;
+        }
+    }
+
+    //lance l'animation de mort
+    public void dead()
+    {
+        isDead = true;
+        foreach (Animator animator in animators)
+        {
+            animator.SetFloat("XSpeed", 0.0f);
+            animator.SetFloat("YSpeed", 0.0f);
         }
     }
 

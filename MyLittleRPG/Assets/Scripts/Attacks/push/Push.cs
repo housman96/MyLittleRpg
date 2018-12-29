@@ -1,62 +1,268 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
-[CreateAssetMenu(fileName = "push", menuName = "PushAttack")]
-
-
+using UnityEngine.UI;
 
 public class Push : Attacks
 {
-    private GameObject swordInstantiated = null;
-    public GameObject sword;
+    /*Objects à afficher*/
+    public GameObject sword;        //image de l'épée, barre de progression du mini-jeu
+    public GameObject canvas;       //canvas contenant le text pour le décompte
+
+    /*Liste des objets à détruire à la fin du jeu*/
+    private List<GameObject> objectToDestroy = new List<GameObject>();
+
+    /*Paramétres du jeu*/
+    public float timeFadeInSword = 1.5f;
+    public float alphaSword = 0.4f;
+    public float gameDuration = 10.0f;
+    public float reussiteCritiqueTime = 5.0f;
+    public float barreSpeed = 0.1f;
+    public float scoreDecrement = 0.024f;
+    public float scoreIncrement = 0.3f;
+    public float pushFactor = 0.25f;
+
+    /*Boolean*/
+    private bool endGame = false;
+
+    /*sauvegarde des paramètres à recharger à la fin du jeu*/
+    private Vector3 positionAttaquant;
+    private Vector3 positionDefenseur;
+    private Sens sensAttaquant;
+    private Sens sensDefenseur;
 
     public override void launchAttack(CharacterStats ourChar, CharacterStats otherChar)
     {
-        float distance = Vector3.Distance(ourChar.transform.position, otherChar.transform.position);
-        //on verifi qu'on est à la bonne distance pour attaquer
-        if (distance < distanceMin)
-        {
-            //on bloque tout ce que controle le joueur
-            GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-            camera.GetComponent<CameraFollowing>().enabled = false;
-            ourChar.GetComponent<CharacterController>().LockMoves();
+        base.launchAttack(ourChar, otherChar);
 
-            //on place les personnages
-            ourChar.GetComponent<CharacterController>().lookAt(Sens.Right);
-            otherChar.GetComponent<CharacterController>().lookAt(Sens.Left);
-            ourChar.GetComponent<CharacterController>().moveToward(new Vector2(camera.transform.position.x - 1f, camera.transform.position.y));
-            otherChar.GetComponent<CharacterController>().moveToward(new Vector2(camera.transform.position.x + 1f, camera.transform.position.y));
 
-            //mini-jeu
+        //on bloque tout ce que controle le joueur
+        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
+        camera.GetComponent<CameraFollowing>().enabled = false;
+        ourChar.GetComponent<CharacterController>().LockMoves();
+        otherChar.GetComponent<CharacterController>().LockMoves();
+        ourChar.GetComponent<BoxCollider2D>().enabled = false;
+        otherChar.GetComponent<BoxCollider2D>().enabled = false;
 
-            swordInstantiated = Instantiate(sword);
-            swordInstantiated.transform.position = new Vector2(camera.transform.position.x, camera.transform.position.y);
+        //on sauvegarde les positions des personnages
+        sensAttaquant = attaquant.GetComponent<CharacterController>().sens;
+        sensDefenseur = defenseur.GetComponent<CharacterController>().sens;
 
-            StartCoroutine("MiniJeu");
+        positionAttaquant = attaquant.transform.position;
+        positionDefenseur = defenseur.transform.position;
 
-            //on replace les personnages
-            //on réactive les personnages
 
-            Debug.Log("launchAttack  distance=" + distance);
-        }
+        //on place les personnages
+        ourChar.GetComponent<CharacterController>().lookAt(Sens.Right);
+        otherChar.GetComponent<CharacterController>().lookAt(Sens.Left);
+        ourChar.GetComponent<CharacterController>().moveToward(new Vector2(camera.transform.position.x - 1f, camera.transform.position.y), timeFadeInSword);
+        otherChar.GetComponent<CharacterController>().moveToward(new Vector2(camera.transform.position.x + 1f, camera.transform.position.y), timeFadeInSword);
+
+        //mini-jeu
+
+        GameObject swordInstantiated = Instantiate(sword);
+        swordInstantiated.transform.position = new Vector2(camera.transform.position.x, camera.transform.position.y);
+        objectToDestroy.Add(swordInstantiated);
+        StartCoroutine("MiniJeu", swordInstantiated);
 
     }
 
 
-    public IEnumerator MiniJeu()
+    public IEnumerator MiniJeu(GameObject sword)
     {
+
+
+        //on crée le mask qui cache la barre de progression rempli ou opaque
+        GameObject maskObject = new GameObject();
+        maskObject.transform.position = sword.transform.position;
+        maskObject.transform.rotation = sword.transform.rotation;
+        maskObject.transform.localScale = sword.transform.localScale;
+        SpriteMask mask = maskObject.AddComponent<SpriteMask>();
+        mask.sprite = sword.GetComponent<SpriteRenderer>().sprite;
+        mask.alphaCutoff = 0.0f;
+
+        objectToDestroy.Add(maskObject);
+
+        //on crée la barre de progression opaque
+        GameObject swordOnInput = Instantiate(sword);
+        swordOnInput.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+        swordOnInput.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 1.0f);
+
+        objectToDestroy.Add(swordOnInput);
+
+        //fondu de l'épée
         float alpha = 0.0f;
-        while (alpha < 1)
+        float timeBeforeFade = Time.time;
+        while (alpha < alphaSword)
         {
             yield return new WaitForSeconds(Time.deltaTime);
-            alpha += 0.02f;
-            swordInstantiated.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, alpha);
+            alpha = alphaSword * (Time.time - timeBeforeFade) / timeFadeInSword;
+            sword.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, alpha);
         }
-        swordInstantiated.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 1.0f);
+        sword.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, alphaSword);
+
+        //timer
+        GameObject canvasInstantiated = Instantiate(canvas);
+        Text textCompteur = canvasInstantiated.GetComponentInChildren<Text>();
+        textCompteur.text = "3";
+        yield return new WaitForSeconds(1);
+        textCompteur.text = "2";
+        yield return new WaitForSeconds(1);
+        textCompteur.text = "1";
+        yield return new WaitForSeconds(1);
+        textCompteur.text = "GO!!!";
+        yield return new WaitForSeconds(1);
+
+        GameObject.DestroyImmediate(canvasInstantiated.gameObject);
+
+        //game
+        float timeBeforeGame = Time.time;
+        float score = 0.0f;
+        float speedAnimation;
+        float step;
+        Vector3 targetAnimation = new Vector3();
+        float lengthSword = sword.GetComponent<SpriteRenderer>().sprite.rect.height / sword.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit;
+
+        while (Time.time - timeBeforeGame < gameDuration && score < 1)
+        {
+            yield return new WaitForFixedUpdate();
+
+            //on diminu le score si il n'est pas inférieur à 0
+            if (score > scoreDecrement * difficultyFactor)
+            {
+                score -= scoreDecrement * difficultyFactor;
+            }
+            else
+            {
+                score = 0.0f;
+            }
+
+            //si le joeur click on incrémente le score
+            bool input = Input.GetMouseButtonDown(0);
+            if (input)
+            {
+                attaquant.GetComponent<CharacterController>().sword(1.0f, 0.0f);
+                score += scoreIncrement;
+            }
+
+            //on déplace la barre de propgression en fonction du score
+            targetAnimation = new Vector3(sword.transform.position.x + score * lengthSword * sword.transform.localScale.x, maskObject.transform.position.y);
+            speedAnimation = Vector3.Distance(maskObject.transform.position, targetAnimation) / barreSpeed;
+            step = speedAnimation * Time.deltaTime;
+            maskObject.transform.position = Vector3.MoveTowards(maskObject.transform.position, targetAnimation, step);
+        }
+
+        //on sauvegarde le temps restant
+        float timeRemaining = gameDuration - Time.time + timeBeforeGame;
+
+        //on amène la barre de progression à son état final
+        while (maskObject.transform.position != targetAnimation)
+        {
+            yield return new WaitForFixedUpdate();
+            targetAnimation = new Vector3(sword.transform.position.x + score * lengthSword * sword.transform.localScale.x, maskObject.transform.position.y);
+            speedAnimation = Vector3.Distance(sword.transform.position, targetAnimation) / barreSpeed;
+            step = speedAnimation * Time.deltaTime;
+            maskObject.transform.position = Vector3.MoveTowards(maskObject.transform.position, targetAnimation, step);
+        }
+
+        //si le jeu est perdu on replace les personnages
+        if (timeRemaining <= 0)
+        {
+            StartCoroutine(resetPosition(swordOnInput, sword));
+            yield return new WaitUntil(() => endGame);
+            endGameProcessing();
+            yield break;
+        }
+
+        //si le jeu est gagné on lance l'animation d'attaque
+        attaquant.GetComponent<CharacterController>().moveToward(defenseur.transform.position - new Vector3(0.3f, 0.0f, 0.0f), 1);
+        attaquant.GetComponent<CharacterController>().sword(1.0f, 0.0f);
+
+        yield return new WaitUntil(() => attaquant.transform.position == defenseur.transform.position - new Vector3(0.3f, 0.0f, 0.0f)); //on attend que l'animation soit terminée
+
+
+        Vector3 moveDefensseurHitted;
+        //si le joueur a fini le jeu en moins de 5 secondes c'est une réussite critique
+        if (timeRemaining > reussiteCritiqueTime)
+        {
+            StartCoroutine(resetPosition(swordOnInput, sword));
+            yield return new WaitUntil(() => endGame);
+
+            moveDefensseurHitted = (positionDefenseur - positionAttaquant).normalized;
+            Vector3 scaler = new Vector3(2 * timeRemaining * pushFactor / difficultyFactor, 2 * timeRemaining * pushFactor / difficultyFactor, 1);
+            moveDefensseurHitted.Scale(scaler);
+
+            defenseur.hurted(2 * dgtsMax);
+        }
+        //sinon c'est la réussite normal
+        else
+        {
+            StartCoroutine(resetPosition(swordOnInput, sword));
+            yield return new WaitUntil(() => endGame);
+
+            moveDefensseurHitted = (positionDefenseur - positionAttaquant).normalized;
+            Vector3 scaler = new Vector3(timeRemaining * pushFactor / difficultyFactor, timeRemaining * pushFactor / difficultyFactor, 1);
+            moveDefensseurHitted.Scale(scaler);
+
+
+            defenseur.hurted((int)(dgtsMin + dgtsMax * timeRemaining / reussiteCritiqueTime));
+        }
+
+        defenseur.GetComponent<CharacterController>().moveToward(positionDefenseur + moveDefensseurHitted, 2.0f);
+        endGameProcessing();
+
     }
 
-    public override void reussiteCritique(CharacterStats char1, CharacterStats char2)
+    public void endGameProcessing()
     {
-        Debug.Log("reussiteCritique");
+        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
+
+        //on débloque les personnages
+        camera.GetComponent<CameraFollowing>().enabled = true;
+        attaquant.GetComponent<CharacterController>().UnlockMoves();
+        defenseur.GetComponent<CharacterController>().UnlockMoves();
+        attaquant.GetComponent<BoxCollider2D>().enabled = true;
+        defenseur.GetComponent<BoxCollider2D>().enabled = true;
+
+
+        //on détruit tous les objets créé pour le jeu
+        foreach (GameObject o in objectToDestroy)
+        {
+            Object.DestroyImmediate(o);
+        }
+        GameObject.DestroyImmediate(gameObject);
+
+
+    }
+
+    public IEnumerator resetPosition(GameObject swordOnInput, GameObject sword)
+    {
+
+
+        //on replace les personnages
+        attaquant.GetComponent<CharacterController>().lookAt(sensAttaquant);
+        defenseur.GetComponent<CharacterController>().lookAt(sensDefenseur);
+        attaquant.GetComponent<CharacterController>().moveToward(positionAttaquant, timeFadeInSword);
+        defenseur.GetComponent<CharacterController>().moveToward(positionDefenseur, timeFadeInSword);
+
+        //FadeOut de lépée
+        float alpha = alphaSword;
+        float timeBeforeFade = Time.time;
+        while (alpha > 0.0f)
+        {
+            yield return new WaitForSeconds(Time.deltaTime);
+            alpha = alphaSword - alphaSword * (Time.time - timeBeforeFade) / timeFadeInSword;
+            sword.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, alpha);
+            swordOnInput.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, alpha / alphaSword);
+        }
+        sword.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 0.0f);
+        swordOnInput.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255, 0.0f);
+
+        yield return new WaitUntil(() => attaquant.transform.position == positionAttaquant);
+        yield return new WaitUntil(() => defenseur.transform.position == positionDefenseur);
+
+        endGame = true;
     }
 }
+
+
