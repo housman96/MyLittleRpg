@@ -51,16 +51,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb00b2d6b11947c48a9d59e075674b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackName: Push
-  distanceMin: 3
-  forceFactor: 0.9
-  dextFactor: 0.1
-  intFactor: 0
-  forceCost: 2
-  dextCost: 2
-  intCost: 2
-  difficultyFactor: 0
-  dgtsMax: 10
-  dgtsMin: 1
-  sword: {fileID: 1424136602350248, guid: 71194f56eec8a344da7ae3d8162d043e, type: 2}
+  swordToInstantiate: {fileID: 1424136602350248, guid: 71194f56eec8a344da7ae3d8162d043e,
+    type: 2}
   canvas: {fileID: 1030573634193568, guid: 1da780407786ff04da0d4ed2ad5a87eb, type: 2}
+  timeFadeInSword: 0.5
+  alphaSword: 0.4
+  gameDuration: 10
+  reussiteCritiqueTime: 5
+  barreSpeed: 0.1
+  scoreDecrement: 0.024
+  scoreIncrement: 0.3
+  pushFactor: 0.25

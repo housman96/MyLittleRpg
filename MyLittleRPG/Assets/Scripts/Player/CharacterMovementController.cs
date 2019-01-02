@@ -3,11 +3,8 @@ using UnityEngine;
 
 public enum Sens { Down, Up, Left, Right }
 
-public class CharacterController : MonoBehaviour
+public class CharacterMovementController : MonoBehaviour
 {
-
-
-
 
     public float speed;
     public GameObject Layers;
@@ -17,11 +14,15 @@ public class CharacterController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private float animationDuration;
     private Vector3 targetAnimation;
+    private Vector3 scaleAnimation;
+    private float speedAnimation;
+    private float speedScale;
+    private float lastTime;
 
     //boolean utilisé pour savoir si on doit lancer une animation
     public bool isPlayer = false;
     private bool isInAnimation = false;
-    private bool isLocked = false;
+    public bool isLocked = false;
     private bool isMoving = false;
     private bool isDisplayed = true;
     private bool isDead = false;
@@ -67,9 +68,9 @@ public class CharacterController : MonoBehaviour
                 //si on est dans une animation
                 if (isInAnimation)
                 {
-                    //on déplace le personnage vers targetAnimation en animationDuration secondes
-                    float speedAnimation = Vector3.Distance(transform.position, targetAnimation) / animationDuration;
-                    float step = speedAnimation * Time.deltaTime;
+                    //on déplace le personnage vers targetAnimation à la vitesse de speedAnimation
+                    float step = speedAnimation * (Time.time - lastTime);
+                    float stepScale = speedScale * (Time.time - lastTime);
 
                     if (!isLocked)
                     {
@@ -78,12 +79,14 @@ public class CharacterController : MonoBehaviour
                         animator.SetFloat("YSpeed", Vector3.MoveTowards(transform.position, targetAnimation, step).y);
                     }
 
+
+                    transform.localScale = Vector3.MoveTowards(transform.localScale, scaleAnimation, stepScale);
                     transform.position = Vector3.MoveTowards(transform.position, targetAnimation, step);
-                    if (transform.position == targetAnimation)
+                    if (transform.position == targetAnimation && transform.localScale == scaleAnimation)
                     {
                         isInAnimation = false;
                     }
-
+                    lastTime = Time.time;
 
                 }
 
@@ -108,7 +111,7 @@ public class CharacterController : MonoBehaviour
                 //si on est un joueur
                 if (isPlayer)
                 {
-                    //si les mouvements du personnage sont pas lock on lance les animations de marches en fonctions des inputs
+                    //si les mouvements du personnage ne sont pas lock on lance les animations de marches en fonctions des inputs
                     if (!isLocked)
                     {
                         //on récupére les inputs
@@ -230,12 +233,30 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    //animation de marche jusqu'au point v
-    public void moveToward(Vector3 v, float time)
+    //animation de marche jusqu'au point target en time temps 
+    public void moveToward(Vector3 target, float time)
     {
         animationDuration = time;
         isInAnimation = true;
-        targetAnimation = v;
+        targetAnimation = target;
+        scaleAnimation = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z);
+
+        speedAnimation = Vector3.Distance(transform.position, targetAnimation) / animationDuration;
+        speedScale = Vector3.Distance(transform.localScale, scaleAnimation) / animationDuration;
+        lastTime = Time.time;
+    }
+
+    //animation de marche jusqu'au point target à la taille scale en time temps 
+    public void moveToward(Vector3 target, Vector3 scale, float time)
+    {
+        animationDuration = time;
+        isInAnimation = true;
+        targetAnimation = target;
+        scaleAnimation = scale;
+
+        speedAnimation = Vector3.Distance(transform.position, targetAnimation) / animationDuration;
+        speedScale = Vector3.Distance(transform.localScale, scaleAnimation) / animationDuration;
+        lastTime = Time.time;
     }
 
     //on fait regarder le personnage d'un côté

@@ -1,19 +1,17 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Push : Attacks
 {
+
     /*Objects à afficher*/
-    public GameObject sword;        //image de l'épée, barre de progression du mini-jeu
+    public GameObject swordToInstantiate;        //image de l'épée, barre de progression du mini-jeu
     public GameObject canvas;       //canvas contenant le text pour le décompte
 
-    /*Liste des objets à détruire à la fin du jeu*/
-    private List<GameObject> objectToDestroy = new List<GameObject>();
 
     /*Paramétres du jeu*/
-    public float timeFadeInSword = 1.5f;
+    public float timeFadeInSword = 0.5f;
     public float alphaSword = 0.4f;
     public float gameDuration = 10.0f;
     public float reussiteCritiqueTime = 5.0f;
@@ -28,49 +26,40 @@ public class Push : Attacks
     /*sauvegarde des paramètres à recharger à la fin du jeu*/
     private Vector3 positionAttaquant;
     private Vector3 positionDefenseur;
+    private Vector3 scaleAttaquant;
+    private Vector3 scaleDefenseur;
     private Sens sensAttaquant;
     private Sens sensDefenseur;
 
-    public override void launchAttack(CharacterStats ourChar, CharacterStats otherChar)
+
+    public override IEnumerator MiniJeu()
     {
-        base.launchAttack(ourChar, otherChar);
 
-
-        //on bloque tout ce que controle le joueur
-        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        camera.GetComponent<CameraFollowing>().enabled = false;
-        ourChar.GetComponent<CharacterController>().LockMoves();
-        otherChar.GetComponent<CharacterController>().LockMoves();
-        ourChar.GetComponent<BoxCollider2D>().enabled = false;
-        otherChar.GetComponent<BoxCollider2D>().enabled = false;
-
-        //on sauvegarde les positions des personnages
-        sensAttaquant = attaquant.GetComponent<CharacterController>().sens;
-        sensDefenseur = defenseur.GetComponent<CharacterController>().sens;
+        //on sauvegarde les parametres des personnages
+        sensAttaquant = attaquantController.sens;
+        sensDefenseur = defenseurController.sens;
 
         positionAttaquant = attaquant.transform.position;
         positionDefenseur = defenseur.transform.position;
 
+        scaleAttaquant = attaquant.transform.localScale;
+        scaleDefenseur = defenseur.transform.localScale;
+
 
         //on place les personnages
-        ourChar.GetComponent<CharacterController>().lookAt(Sens.Right);
-        otherChar.GetComponent<CharacterController>().lookAt(Sens.Left);
-        ourChar.GetComponent<CharacterController>().moveToward(new Vector2(camera.transform.position.x - 1f, camera.transform.position.y), timeFadeInSword);
-        otherChar.GetComponent<CharacterController>().moveToward(new Vector2(camera.transform.position.x + 1f, camera.transform.position.y), timeFadeInSword);
+        Vector2 gamePositionAttaquant = new Vector2(mainCamera.transform.position.x - scaleVector.x * 1.5f, mainCamera.transform.position.y);
+        Vector2 gamePositionDefensseur = new Vector2(mainCamera.transform.position.x + scaleVector.x * 1.5f, mainCamera.transform.position.y);
 
-        //mini-jeu
+        attaquantController.lookAt(Sens.Right);
+        defenseurController.lookAt(Sens.Left);
+        attaquantController.moveToward(gamePositionAttaquant, scaleVector, timeFadeInSword);
+        defenseurController.moveToward(gamePositionDefensseur, scaleVector, timeFadeInSword);
 
-        GameObject swordInstantiated = Instantiate(sword);
-        swordInstantiated.transform.position = new Vector2(camera.transform.position.x, camera.transform.position.y);
-        objectToDestroy.Add(swordInstantiated);
-        StartCoroutine("MiniJeu", swordInstantiated);
-
-    }
-
-
-    public IEnumerator MiniJeu(GameObject sword)
-    {
-
+        //on instantiate sword
+        GameObject sword = Instantiate(swordToInstantiate);
+        sword.transform.position = new Vector2(mainCamera.transform.position.x, mainCamera.transform.position.y);
+        sword.transform.localScale = scaleVector;
+        objectToDestroy.Add(sword);
 
         //on crée le mask qui cache la barre de progression rempli ou opaque
         GameObject maskObject = new GameObject();
@@ -141,7 +130,7 @@ public class Push : Attacks
             bool input = Input.GetMouseButtonDown(0);
             if (input)
             {
-                attaquant.GetComponent<CharacterController>().sword(1.0f, 0.0f);
+                attaquantController.sword(1.0f, 0.0f);
                 score += scoreIncrement;
             }
 
@@ -175,10 +164,10 @@ public class Push : Attacks
         }
 
         //si le jeu est gagné on lance l'animation d'attaque
-        attaquant.GetComponent<CharacterController>().moveToward(defenseur.transform.position - new Vector3(0.3f, 0.0f, 0.0f), 1);
-        attaquant.GetComponent<CharacterController>().sword(1.0f, 0.0f);
+        attaquantController.moveToward(defenseur.transform.position - new Vector3(0.3f * scaleVector.x, 0.0f, 0.0f), 0.5f);
+        attaquantController.sword(1.0f, 0.0f);
 
-        yield return new WaitUntil(() => attaquant.transform.position == defenseur.transform.position - new Vector3(0.3f, 0.0f, 0.0f)); //on attend que l'animation soit terminée
+        yield return new WaitUntil(() => attaquant.transform.position == defenseur.transform.position - new Vector3(0.3f * scaleVector.x, 0.0f, 0.0f)); //on attend que l'animation soit terminée
 
 
         Vector3 moveDefensseurHitted;
@@ -208,42 +197,22 @@ public class Push : Attacks
             defenseur.hurted((int)(dgtsMin + dgtsMax * timeRemaining / reussiteCritiqueTime));
         }
 
-        defenseur.GetComponent<CharacterController>().moveToward(positionDefenseur + moveDefensseurHitted, 2.0f);
+        defenseurController.moveToward(positionDefenseur + moveDefensseurHitted, 2.0f);
+        yield return new WaitUntil(() => defenseur.transform.position == positionDefenseur + moveDefensseurHitted);
         endGameProcessing();
 
     }
 
-    public void endGameProcessing()
-    {
-        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
 
-        //on débloque les personnages
-        camera.GetComponent<CameraFollowing>().enabled = true;
-        attaquant.GetComponent<CharacterController>().UnlockMoves();
-        defenseur.GetComponent<CharacterController>().UnlockMoves();
-        attaquant.GetComponent<BoxCollider2D>().enabled = true;
-        defenseur.GetComponent<BoxCollider2D>().enabled = true;
-
-
-        //on détruit tous les objets créé pour le jeu
-        foreach (GameObject o in objectToDestroy)
-        {
-            Object.DestroyImmediate(o);
-        }
-        GameObject.DestroyImmediate(gameObject);
-
-
-    }
 
     public IEnumerator resetPosition(GameObject swordOnInput, GameObject sword)
     {
 
-
         //on replace les personnages
-        attaquant.GetComponent<CharacterController>().lookAt(sensAttaquant);
-        defenseur.GetComponent<CharacterController>().lookAt(sensDefenseur);
-        attaquant.GetComponent<CharacterController>().moveToward(positionAttaquant, timeFadeInSword);
-        defenseur.GetComponent<CharacterController>().moveToward(positionDefenseur, timeFadeInSword);
+        attaquantController.lookAt(sensAttaquant);
+        defenseurController.lookAt(sensDefenseur);
+        attaquantController.moveToward(positionAttaquant, scaleAttaquant, timeFadeInSword);
+        defenseurController.moveToward(positionDefenseur, scaleDefenseur, timeFadeInSword);
 
         //FadeOut de lépée
         float alpha = alphaSword;
@@ -260,7 +229,6 @@ public class Push : Attacks
 
         yield return new WaitUntil(() => attaquant.transform.position == positionAttaquant);
         yield return new WaitUntil(() => defenseur.transform.position == positionDefenseur);
-
         endGame = true;
     }
 }

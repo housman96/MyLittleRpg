@@ -27,6 +27,9 @@ public class CharacterStats : MonoBehaviour
     public ScriptableAttacks attack3;
     public ScriptableAttacks attack4;
 
+    //bool
+    public bool isAttacking = false;
+
     //test
     public CharacterStats other;
 
@@ -35,7 +38,7 @@ public class CharacterStats : MonoBehaviour
     {
         if (currentPV <= 0)
         {
-            GetComponent<CharacterController>().dead();
+            GetComponent<CharacterMovementController>().dead();
         }
 
         //test de la methode à enlever
@@ -49,6 +52,6 @@ public class CharacterStats : MonoBehaviour
     public void hurted(int dgts)
     {
         currentPV -= dgts;
-        StartCoroutine(GetComponent<CharacterController>().hurted());
+        StartCoroutine(GetComponent<CharacterMovementController>().hurted());
     }
 }
