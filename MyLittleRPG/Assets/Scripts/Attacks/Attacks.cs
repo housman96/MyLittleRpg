@@ -31,6 +31,8 @@ public class Attacks : MonoBehaviour
 
     protected float difficultyFactor;
 
+    //parametres des personnages
+
     protected CharacterStats attaquant;
     protected CharacterStats defenseur;
 
