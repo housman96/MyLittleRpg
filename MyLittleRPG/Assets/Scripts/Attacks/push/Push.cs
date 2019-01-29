@@ -36,8 +36,8 @@ public class Push : Attacks
     {
 
         //on sauvegarde les parametres des personnages
-        sensAttaquant = attaquantController.sens;
-        sensDefenseur = defenseurController.sens;
+        sensAttaquant = attaquantAnimationController.sens;
+        sensDefenseur = defenseurAnimationController.sens;
 
         positionAttaquant = attaquant.transform.position;
         positionDefenseur = defenseur.transform.position;
@@ -50,10 +50,10 @@ public class Push : Attacks
         Vector2 gamePositionAttaquant = new Vector2(mainCamera.transform.position.x - scaleVector.x * 1.5f, mainCamera.transform.position.y);
         Vector2 gamePositionDefensseur = new Vector2(mainCamera.transform.position.x + scaleVector.x * 1.5f, mainCamera.transform.position.y);
 
-        attaquantController.lookAt(Sens.Right);
-        defenseurController.lookAt(Sens.Left);
-        attaquantController.moveToward(gamePositionAttaquant, scaleVector, timeFadeInSword);
-        defenseurController.moveToward(gamePositionDefensseur, scaleVector, timeFadeInSword);
+        attaquantAnimationController.lookAt(Sens.Right);
+        defenseurAnimationController.lookAt(Sens.Left);
+        attaquantInputController.moveToward(gamePositionAttaquant, scaleVector, timeFadeInSword);
+        defenseurInputController.moveToward(gamePositionDefensseur, scaleVector, timeFadeInSword);
 
         //on instantiate sword
         GameObject sword = Instantiate(swordToInstantiate);
@@ -130,7 +130,7 @@ public class Push : Attacks
             bool input = Input.GetMouseButtonDown(0);
             if (input)
             {
-                attaquantController.sword(1.0f, 0.0f);
+                attaquantAnimationController.sword(1.0f, 0.0f);
                 score += scoreIncrement;
             }
 
@@ -164,8 +164,8 @@ public class Push : Attacks
         }
 
         //si le jeu est gagné on lance l'animation d'attaque
-        attaquantController.moveToward(defenseur.transform.position - new Vector3(0.3f * scaleVector.x, 0.0f, 0.0f), 0.5f);
-        attaquantController.sword(1.0f, 0.0f);
+        attaquantInputController.moveToward(defenseur.transform.position - new Vector3(0.3f * scaleVector.x, 0.0f, 0.0f), 0.5f);
+        attaquantAnimationController.sword(1.0f, 0.0f);
 
         yield return new WaitUntil(() => attaquant.transform.position == defenseur.transform.position - new Vector3(0.3f * scaleVector.x, 0.0f, 0.0f)); //on attend que l'animation soit terminée
 
@@ -197,7 +197,7 @@ public class Push : Attacks
             defenseur.hurted((int)(dgtsMin + dgtsMax * timeRemaining / reussiteCritiqueTime));
         }
 
-        defenseurController.moveToward(positionDefenseur + moveDefensseurHitted, 2.0f);
+        defenseurInputController.moveToward(positionDefenseur + moveDefensseurHitted, 2.0f);
         yield return new WaitUntil(() => defenseur.transform.position == positionDefenseur + moveDefensseurHitted);
         endGameProcessing();
 
@@ -209,10 +209,10 @@ public class Push : Attacks
     {
 
         //on replace les personnages
-        attaquantController.lookAt(sensAttaquant);
-        defenseurController.lookAt(sensDefenseur);
-        attaquantController.moveToward(positionAttaquant, scaleAttaquant, timeFadeInSword);
-        defenseurController.moveToward(positionDefenseur, scaleDefenseur, timeFadeInSword);
+        attaquantAnimationController.lookAt(sensAttaquant);
+        defenseurAnimationController.lookAt(sensDefenseur);
+        attaquantInputController.moveToward(positionAttaquant, scaleAttaquant, timeFadeInSword);
+        defenseurInputController.moveToward(positionDefenseur, scaleDefenseur, timeFadeInSword);
 
         //FadeOut de lépée
         float alpha = alphaSword;

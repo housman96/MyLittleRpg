@@ -36,6 +36,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4893516052492504}
+  - component: {fileID: 114723340270882546}
   - component: {fileID: 114018390394283604}
   - component: {fileID: 114573908275282738}
   - component: {fileID: 114291856430071948}
@@ -719,9 +720,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab82e6fe3c7a1ee40befb106c0460358, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPlayer: 1
-  speed: 0.2
   Layers: {fileID: 1464297645453302}
+  sens: 0
+  input: {x: 0, y: 0}
+  isLocked: 0
 --- !u!114 &114291856430071948
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -753,12 +755,13 @@ MonoBehaviour:
   intel: 10
   currentIntel: 10
   resIntel: 10
-  PV: 0
-  currentPV: 0
+  PV: 10
+  currentPV: 10
   attack1: {fileID: 11400000, guid: 8e116a4f9ba9b4442a6890c4ffecae5d, type: 2}
   attack2: {fileID: 0}
   attack3: {fileID: 0}
   attack4: {fileID: 0}
+  isAttacking: 0
   other: {fileID: 0}
 --- !u!114 &114591023557850322
 MonoBehaviour:
@@ -771,6 +774,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf3a61b1be1b4849b5dba3fe98e76b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114723340270882546
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1198276559348188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8e4aa50ce68a2943b928785814fec11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPlayer: 1
+  speed: 2
 --- !u!212 &212077731350676206
 SpriteRenderer:
   m_ObjectHideFlags: 1

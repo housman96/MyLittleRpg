@@ -38,7 +38,7 @@ public class CharacterStats : MonoBehaviour
     {
         if (currentPV <= 0)
         {
-            GetComponent<CharacterMovementController>().dead();
+            GetComponent<CharacterAnimationController>().dead();
         }
 
         //test de la methode à enlever
@@ -52,6 +52,6 @@ public class CharacterStats : MonoBehaviour
     public void hurted(int dgts)
     {
         currentPV -= dgts;
-        StartCoroutine(GetComponent<CharacterMovementController>().hurted());
+        StartCoroutine(GetComponent<CharacterAnimationController>().hurted());
     }
 }

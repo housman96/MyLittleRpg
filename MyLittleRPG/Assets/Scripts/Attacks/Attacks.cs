@@ -36,8 +36,11 @@ public class Attacks : MonoBehaviour
     protected CharacterStats attaquant;
     protected CharacterStats defenseur;
 
-    protected CharacterMovementController attaquantController;
-    protected CharacterMovementController defenseurController;
+    protected CharacterAnimationController attaquantAnimationController;
+    protected CharacterAnimationController defenseurAnimationController;
+
+    protected CharacterInputController attaquantInputController;
+    protected CharacterInputController defenseurInputController;
 
     //dégats
     protected int dgtsMax;
@@ -233,15 +236,20 @@ public class Attacks : MonoBehaviour
 
         //on sauvegarde les paramètres dont on aura besoin dans la coroutine
 
-        attaquantController = attaquant.GetComponent<CharacterMovementController>();
-        defenseurController = defenseur.GetComponent<CharacterMovementController>();
+        attaquantAnimationController = attaquant.GetComponent<CharacterAnimationController>();
+        defenseurAnimationController = defenseur.GetComponent<CharacterAnimationController>();
+
+        attaquantInputController = attaquant.GetComponent<CharacterInputController>();
+        defenseurInputController = defenseur.GetComponent<CharacterInputController>();
 
         difficultyFactor = ((defenseur.resDext * dextFactor / attaquant.dext) + (defenseur.resForce * forceFactor / attaquant.force) + (defenseur.resIntel * intFactor / attaquant.intel));
 
         //on bloque tout ce que controle les personnages
         mainCamera.GetComponent<CameraFollowing>().enabled = false;
-        attaquantController.LockMoves();
-        defenseurController.LockMoves();
+        attaquantAnimationController.Lock();
+        defenseurAnimationController.Lock();
+        attaquantInputController.Lock();
+        defenseurInputController.Lock();
         attaquant.GetComponent<BoxCollider2D>().enabled = false;
         defenseur.GetComponent<BoxCollider2D>().enabled = false;
 
@@ -257,8 +265,10 @@ public class Attacks : MonoBehaviour
     {
         //on débloque les personnages
         mainCamera.GetComponent<CameraFollowing>().enabled = true;
-        attaquantController.UnlockMoves();
-        defenseurController.UnlockMoves();
+        attaquantAnimationController.Unlock();
+        defenseurAnimationController.Unlock();
+        attaquantInputController.Unlock();
+        defenseurInputController.Unlock();
         attaquant.GetComponent<BoxCollider2D>().enabled = true;
         defenseur.GetComponent<BoxCollider2D>().enabled = true;
 

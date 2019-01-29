@@ -67,7 +67,10 @@
     <Compile Include="Assets\Scripts\Attacks\ScriptableAttacks.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraFollowing.cs" />
     <Compile Include="Assets\Scripts\pathfinding\Astar.cs" />
-    <Compile Include="Assets\Scripts\Player\CharacterMovementController.cs" />
+    <Compile Include="Assets\Scripts\pathfinding\Graphe.cs" />
+    <Compile Include="Assets\Scripts\pathfinding\Noeud.cs" />
+    <Compile Include="Assets\Scripts\Player\CharacterAnimationController.cs" />
+    <Compile Include="Assets\Scripts\Player\CharacterInputController.cs" />
     <Compile Include="Assets\Scripts\Player\CharacterStats.cs" />
     <Compile Include="Assets\Scripts\Player\LayerOrderer.cs" />
     <Reference Include="UnityEditor.StandardEvents">

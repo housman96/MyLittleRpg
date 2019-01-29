@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Astar : MonoBehaviour
@@ -23,18 +22,6 @@ public class Astar : MonoBehaviour
     void Start()
     {
         graphe = new Graphe(new Vector2(0, 0), 5, 5, 0.1f);
-        foreach (Noeud node in graphe.tabNoeud)
-        {
-            ////haut
-            //Debug.DrawLine(new Vector3(node.position.x - node.halfSize, node.position.y + node.halfSize), new Vector3(node.position.x + node.halfSize, node.position.y + node.halfSize), Color.white, 100);
-            ////bas
-            //Debug.DrawLine(new Vector3(node.position.x - node.halfSize, node.position.y - node.halfSize), new Vector3(node.position.x + node.halfSize, node.position.y - node.halfSize), Color.white, 100);
-            ////gauche
-            //Debug.DrawLine(new Vector3(node.position.x - node.halfSize, node.position.y + node.halfSize), new Vector3(node.position.x - node.halfSize, node.position.y - node.halfSize), Color.white, 100);
-            ////droite
-            //Debug.DrawLine(new Vector3(node.position.x + node.halfSize, node.position.y + node.halfSize), new Vector3(node.position.x + node.halfSize, node.position.y - node.halfSize), Color.white, 100);
-        }
-
         Debug.Log(nearestWay());
     }
 
@@ -73,11 +60,12 @@ public class Astar : MonoBehaviour
             openList.Remove(u);
 
             //       si u.x == objectif.x et u.y == objectif.y
-            if (u.position == targetNoeud.position)
+            Collider2D uCollider = Physics2D.OverlapBox(u.position + start.GetComponent<BoxCollider2D>().offset, start.GetComponent<BoxCollider2D>().size, 0);
+            if (uCollider != null && uCollider.gameObject == target)
             {
                 //           reconstituerChemin(u)
                 //           terminer le programme
-                buildPath(targetNoeud);
+                start.GetComponent<CharacterInputController>().moveToward(buildPath(u), 0.05f);
                 return 1;
             }
 
@@ -105,7 +93,8 @@ public class Astar : MonoBehaviour
                         //                v.cout = u.cout +1 
                         //                v.heuristique = v.cout + distance([v.x, v.y], [objectif.x, objectif.y])
                         //                openList.ajouter(v)
-                        if (newCout < v.cout && Physics2D.OverlapBox(v.position, new Vector2(v.halfSize * 2, v.halfSize * 2), 0) == null)
+                        Collider2D vCollisioner = Physics2D.OverlapBox(v.position + start.GetComponent<BoxCollider2D>().offset, start.GetComponent<BoxCollider2D>().size, 0);
+                        if (newCout < v.cout && (vCollisioner == null || vCollisioner.gameObject == start || vCollisioner.gameObject == target))
                         {
 
                             if (openList.Contains(v))
@@ -139,7 +128,7 @@ public class Astar : MonoBehaviour
     public Stack<Noeud> buildPath(Noeud target)
     {
         Stack<Noeud> res = new Stack<Noeud>();
-        Noeud u = target;
+        Noeud u = graphe[target.previousNoeud.x, target.previousNoeud.y];
         int limite = 10000;
         int i = 0;
         while (u.previousNoeud.x >= 0 && u.previousNoeud.y >= 0 && limite > i)
@@ -147,8 +136,16 @@ public class Astar : MonoBehaviour
             res.Push(u);
             u = graphe[u.previousNoeud.x, u.previousNoeud.y];
             i++;
+            //haut
+            Debug.DrawLine(new Vector3(u.position.x - u.halfSize, u.position.y + u.halfSize), new Vector3(u.position.x + u.halfSize, u.position.y + u.halfSize), Color.white, 100);
+            //bas
+            Debug.DrawLine(new Vector3(u.position.x - u.halfSize, u.position.y - u.halfSize), new Vector3(u.position.x + u.halfSize, u.position.y - u.halfSize), Color.white, 100);
+            //gauche
+            Debug.DrawLine(new Vector3(u.position.x - u.halfSize, u.position.y + u.halfSize), new Vector3(u.position.x - u.halfSize, u.position.y - u.halfSize), Color.white, 100);
+            //droite
+            Debug.DrawLine(new Vector3(u.position.x + u.halfSize, u.position.y + u.halfSize), new Vector3(u.position.x + u.halfSize, u.position.y - u.halfSize), Color.white, 100);
+
         }
-        res.Push(u);
 
         if (i >= limite)
         {
@@ -162,188 +159,3 @@ public class Astar : MonoBehaviour
 
 
 
-
-public class Noeud : IComparable<Noeud>
-{
-    public float halfSize = 1;
-
-    public Vector2 position;
-    public float cout = 0;
-    public float heuristique = 0;
-
-    public Vector2Int previousNoeud = new Vector2Int(-1, -1);
-
-
-    /*CONSTRUCTEURS*/
-
-    public Noeud()
-    {
-
-    }
-
-    public Noeud(float x, float y)
-    {
-        position.x = x;
-        position.y = y;
-
-    }
-
-    public Noeud(Noeud noeud)
-    {
-        halfSize = noeud.halfSize;
-        position = noeud.position;
-        cout = noeud.cout;
-        heuristique = noeud.heuristique;
-        previousNoeud = noeud.previousNoeud;
-    }
-
-    public Noeud(Vector2 position)
-    {
-        this.position = position;
-    }
-
-    public Noeud(float x, float y, float halfSize)
-    {
-        position.x = x;
-        position.y = y;
-        this.halfSize = halfSize;
-    }
-
-    public Noeud(Vector2 newPosition, float halfSize)
-    {
-        position = newPosition;
-        this.halfSize = halfSize;
-    }
-
-    public Noeud(float x, float y, float halfSize, float cout, float heuristique)
-    {
-        position.x = x;
-        position.y = y;
-        this.halfSize = halfSize;
-        this.cout = cout;
-        this.heuristique = heuristique;
-    }
-
-    public Noeud(Vector2 newPosition, float halfSize, float cout, float heuristique)
-    {
-        position = newPosition;
-        this.halfSize = halfSize;
-        this.cout = cout;
-        this.heuristique = heuristique;
-    }
-
-    /*Check si la position passée est dans le noeud*/
-    public bool isInNoeud(float x, float y)
-    {
-        if (x < position.x + halfSize && x > position.x - halfSize && y < position.y + halfSize && y > position.y - halfSize)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public int CompareTo(Noeud other)
-    {
-        int res = 0;
-
-        if (heuristique < other.heuristique)
-        {
-            res = -1;
-        }
-        else
-        {
-            if (heuristique > other.heuristique)
-            {
-                res = 1;
-            }
-        }
-
-        return res;
-    }
-}
-
-public class Graphe
-{
-    public int rows = 1;
-    public int cols = 1;
-    public Vector2 center = new Vector2(0, 0);
-    public float sizeNoeud = 1;
-    public Noeud[,] tabNoeud = new Noeud[1, 1];
-
-    public Noeud this[int i, int j]
-    {
-        get { return tabNoeud[i, j]; }
-        set { tabNoeud[i, j] = value; }
-    }
-
-    public Graphe(Vector2 newCenter, float sizeX, float sizeY, float newSizeNoeud)
-    {
-        center = newCenter;
-        rows = Mathf.RoundToInt(sizeX / newSizeNoeud);
-        cols = Mathf.RoundToInt(sizeY / newSizeNoeud);
-        sizeNoeud = newSizeNoeud;
-
-        Init();
-    }
-
-
-    public void Init()
-    {
-        tabNoeud = new Noeud[rows, cols];
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < cols; j++)
-            {
-                Vector2 positionNoeud = new Vector2(center.x - ((rows / 2) - i) * sizeNoeud, center.y - ((cols / 2) - j) * sizeNoeud);
-                tabNoeud[i, j] = new Noeud(positionNoeud, sizeNoeud / 2, float.MaxValue, float.MaxValue);
-            }
-        }
-    }
-
-    public bool isInGraphe(Vector2 pos)
-    {
-        bool res = false;
-        float rightBound = center.x + (rows * sizeNoeud) / 2;
-        float leftBound = center.x - (rows * sizeNoeud) / 2;
-        float hautBound = center.y + (cols * sizeNoeud) / 2;
-        float basBound = center.y - (cols * sizeNoeud) / 2;
-
-        if (pos.x < rightBound && pos.x > leftBound && pos.y > basBound && pos.y < hautBound)
-        {
-            res = true;
-        }
-        return res;
-    }
-
-    public Noeud getNoeudAtPos(Vector2 pos)
-    {
-        Noeud res = null;
-
-        if (isInGraphe(pos))
-        {
-            int i = Mathf.RoundToInt((rows / 2) - ((center.x - pos.x) / sizeNoeud));
-            int j = Mathf.RoundToInt((cols / 2) - ((center.y - pos.y) / sizeNoeud));
-            if (i < rows && j < cols)
-            {
-                res = tabNoeud[i, j];
-            }
-        }
-        return res;
-    }
-
-    public Vector2Int getIndexAtPos(Vector2 pos)
-    {
-        Vector2Int res = new Vector2Int(-1, -1);
-        if (isInGraphe(pos))
-        {
-            int i = Mathf.RoundToInt((rows / 2) - ((center.x - pos.x) / sizeNoeud));
-            int j = Mathf.RoundToInt((cols / 2) - ((center.y - pos.y) / sizeNoeud));
-            if (i < rows && j < cols)
-            {
-                res = new Vector2Int(i, j);
-            }
-        }
-        return res;
-    }
-
-}
