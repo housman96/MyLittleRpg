@@ -196,7 +196,8 @@ public class Push : Attacks
 
             defenseur.hurted((int)(dgtsMin + dgtsMax * timeRemaining / reussiteCritiqueTime));
         }
-
+        attaquant.GetComponent<BoxCollider2D>().enabled = true;
+        defenseur.GetComponent<BoxCollider2D>().enabled = true;
         defenseurInputController.moveToward(positionDefenseur + moveDefensseurHitted, 2.0f);
         yield return new WaitUntil(() => defenseur.transform.position == positionDefenseur + moveDefensseurHitted);
         endGameProcessing();

@@ -127,19 +127,19 @@ public class CharacterInputController : MonoBehaviour
     }
 
     //animation de marche jusqu'au point target en time temps 
-    public void moveToward(Stack<Noeud> stack, float time)
+    public void moveToward(Stack<Noeud> stack)
     {
-        isInAnimation = true;
-        if (stack.Count != 0)
+        if (stack != null && stack.Count != 0)
         {
+            isInAnimation = true;
             targetAnimation = stack.Pop().position;
+            this.stack = stack;
+            scaleAnimation = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            speedAnimation = speed;
+            animationDuration = Vector3.Distance(transform.position, targetAnimation) / speedAnimation;
+            speedScale = Vector3.Distance(transform.localScale, scaleAnimation) / animationDuration;
+            lastTime = Time.time;
         }
-        this.stack = stack;
-        scaleAnimation = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z);
-        speedAnimation = speed;
-        animationDuration = Vector3.Distance(transform.position, targetAnimation) / speedAnimation;
-        speedScale = Vector3.Distance(transform.localScale, scaleAnimation) / animationDuration;
-        lastTime = Time.time;
     }
 
 
@@ -167,5 +167,17 @@ public class CharacterInputController : MonoBehaviour
         speedAnimation = Vector3.Distance(transform.position, targetAnimation) / animationDuration;
         speedScale = Vector3.Distance(transform.localScale, scaleAnimation) / animationDuration;
         lastTime = Time.time;
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("test");
+        if (isInAnimation)
+        {
+
+            stack.Clear();
+            targetAnimation = transform.position;
+            isInAnimation = false;
+        }
     }
 }

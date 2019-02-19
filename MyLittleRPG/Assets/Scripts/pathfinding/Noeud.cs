@@ -4,27 +4,21 @@ using UnityEngine;
 
 public class Noeud : IComparable<Noeud>
 {
-    public float halfSize = 1;
-
-    public Vector2 position;
+    public float halfSize = 1;  //demitaille d'un noeud
     public float cout = 0;
     public float heuristique = 0;
-
-    public Vector2Int previousNoeud = new Vector2Int(-1, -1);
+    public Vector2 position;
+    public Vector2Int previousNoeud = new Vector2Int(-1, -1);   //noeud précédent pour le Astar
 
 
     /*CONSTRUCTEURS*/
 
-    public Noeud()
-    {
-
-    }
+    public Noeud() { }
 
     public Noeud(float x, float y)
     {
         position.x = x;
         position.y = y;
-
     }
 
     public Noeud(Noeud noeud)
@@ -81,6 +75,7 @@ public class Noeud : IComparable<Noeud>
         return false;
     }
 
+    /*CompareTo pour le rangement des noeud dans l'openList de l'Astar*/
     public int CompareTo(Noeud other)
     {
         int res = 0;

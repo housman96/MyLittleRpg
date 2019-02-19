@@ -91,7 +91,6 @@ public class CharacterAnimationController : MonoBehaviour
                 if (isDead)
                 {
                     animator.SetBool("Dead", true);
-                    return;
                 }
 
                 //si on doit afficher le personnage

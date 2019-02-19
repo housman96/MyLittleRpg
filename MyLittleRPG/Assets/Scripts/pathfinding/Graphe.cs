@@ -9,12 +9,14 @@ public class Graphe
     public float sizeNoeud = 1;
     public Noeud[,] tabNoeud = new Noeud[1, 1];
 
+    //overload []
     public Noeud this[int i, int j]
     {
         get { return tabNoeud[i, j]; }
         set { tabNoeud[i, j] = value; }
     }
 
+    /*CONSTRUCTEURS*/
     public Graphe(Vector2 newCenter, float sizeX, float sizeY, float newSizeNoeud)
     {
         center = newCenter;
@@ -25,7 +27,7 @@ public class Graphe
         Init();
     }
 
-
+    /*Initialisation du graphe*/
     public void Init()
     {
         tabNoeud = new Noeud[rows, cols];
@@ -39,6 +41,7 @@ public class Graphe
         }
     }
 
+    //check si la postion pos est dans le graphe
     public bool isInGraphe(Vector2 pos)
     {
         bool res = false;
@@ -54,6 +57,7 @@ public class Graphe
         return res;
     }
 
+    //renvoi le noeud dans lequel pos est 
     public Noeud getNoeudAtPos(Vector2 pos)
     {
         Noeud res = null;
@@ -70,6 +74,7 @@ public class Graphe
         return res;
     }
 
+    //renvoi l'index dans le graphe du noeud à la position pos
     public Vector2Int getIndexAtPos(Vector2 pos)
     {
         Vector2Int res = new Vector2Int(-1, -1);
