@@ -2,6 +2,8 @@
 
 public class CharacterStats : MonoBehaviour
 {
+    public string name;
+
     //Force
     public int force;
     public int currentForce;

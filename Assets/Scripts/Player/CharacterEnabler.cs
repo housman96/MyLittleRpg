@@ -7,6 +7,8 @@ public class CharacterEnabler : MonoBehaviour
 
     public string name;
 
+    public CharacterStats stats;
+
     //part body
     public GameObject body;
     public GameObject eyes;
@@ -25,6 +27,7 @@ public class CharacterEnabler : MonoBehaviour
     {
         name = character.name;
         gameObject.name = name;
+        stats.name = character.name;
 
         body.GetComponent<Animator>().runtimeAnimatorController = character.body.GetComponent<Animator>().runtimeAnimatorController;
         eyes.GetComponent<Animator>().runtimeAnimatorController = character.eyes.GetComponent<Animator>().runtimeAnimatorController;

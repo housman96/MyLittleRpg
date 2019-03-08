@@ -138,6 +138,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1713185144616366
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4255162112747462}
+  - component: {fileID: 122922666552030558}
+  m_Layer: 0
+  m_Name: halo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1720898271769286
 GameObject:
   m_ObjectHideFlags: 1
@@ -277,6 +293,19 @@ Transform:
   m_Father: {fileID: 4662412641761780}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4255162112747462
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1713185144616366}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4267157426600058}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4265480546793924
 Transform:
   m_ObjectHideFlags: 1
@@ -301,6 +330,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4662412641761780}
+  - {fileID: 4255162112747462}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -698,7 +728,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e4aa50ce68a2943b928785814fec11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPlayer: 1
+  isPlayer: 0
   speed: 2
 --- !u!114 &114569227644607024
 MonoBehaviour:
@@ -726,6 +756,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06820eb0909fcbe42869855740ccd3f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  halo: {fileID: 1713185144616366}
 --- !u!114 &114794255740735002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -737,6 +768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bce46e5a675a60a43ab1e3eb19a964c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  name: 
   force: 10
   currentForce: 10
   resForce: 10
@@ -778,6 +810,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   character: {fileID: 11400000, guid: 7d062bdf074b7b14c9fd574573a4239e, type: 2}
   name: 
+  stats: {fileID: 114794255740735002}
   body: {fileID: 1884176839199360}
   eyes: {fileID: 1263952266570800}
   chest: {fileID: 1965820038177208}
@@ -789,6 +822,17 @@ MonoBehaviour:
   weapon: {fileID: 1720898271769286}
   hat: {fileID: 1002449175551478}
   nose: {fileID: 1537321004375588}
+--- !u!122 &122922666552030558
+Halo:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1713185144616366}
+  m_Enabled: 1
+  m_Color:
+    serializedVersion: 2
+    rgba: 3183986651
+  m_Size: 0.45
 --- !u!212 &212060651624950002
 SpriteRenderer:
   m_ObjectHideFlags: 1

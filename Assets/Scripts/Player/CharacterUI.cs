@@ -27,7 +27,6 @@ public class CharacterUI : MonoBehaviour
         isMouseOver = false;
         halo.SetActive(false);
         halo.GetComponent<Behaviour>();
-        halo
     }
 
 
@@ -35,7 +34,7 @@ public class CharacterUI : MonoBehaviour
     {
         if (isMouseOver)
         {
-            Debug.Log("click");
+            FindObjectOfType<UICharacterStats>().setStats(gameObject.GetComponent<CharacterStats>());
         }
     }
 }
