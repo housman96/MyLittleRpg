@@ -53,6 +53,9 @@ public class SpriteProcessor : AssetPostprocessor
 
     public void OnPostprocessSprites(Texture2D texture, Sprite[] sprite)
     {
+        if (assetPath.IndexOf("/TextureCharacter/") == -1)
+            return;
+
         //on importe les sprite uniquement si on a déjà refersh
         if (sprite.Length == 0)
         {
