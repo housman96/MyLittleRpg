@@ -4,6 +4,8 @@
 
 public class ScriptableAttacks : ScriptableObject
 {
+    public Sprite imageAttack;
+
     //nom de l'attaque
     public string attackName;
 

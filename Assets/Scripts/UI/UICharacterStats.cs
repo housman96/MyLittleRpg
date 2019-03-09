@@ -25,6 +25,13 @@ public class UICharacterStats : MonoBehaviour
     public Image ResDextMask;
     public Image ResIntMask;
 
+    public Image imageAttack1;
+    public Image imageAttack2;
+    public Image imageAttack3;
+    public Image imageAttack4;
+
+    public Sprite imageAttackDefault;
+
 
     // Use this for initialization
     void Start()
@@ -52,6 +59,26 @@ public class UICharacterStats : MonoBehaviour
         ForceMask.fillAmount = (float)stats.currentForce / (float)stats.force;
         DextMask.fillAmount = (float)stats.currentDext / (float)stats.dext;
         IntMask.fillAmount = (float)stats.currentIntel / (float)stats.intel;
+
+        if (stats.attack1 != null)
+            imageAttack1.sprite = stats.attack1.imageAttack;
+        else
+            imageAttack1.sprite = imageAttackDefault;
+
+        if (stats.attack2 != null)
+            imageAttack2.sprite = stats.attack2.imageAttack;
+        else
+            imageAttack2.sprite = imageAttackDefault;
+
+        if (stats.attack3 != null)
+            imageAttack3.sprite = stats.attack3.imageAttack;
+        else
+            imageAttack3.sprite = imageAttackDefault;
+
+        if (stats.attack4 != null)
+            imageAttack4.sprite = stats.attack4.imageAttack;
+        else
+            imageAttack4.sprite = imageAttackDefault;
     }
 
     public void setStats(CharacterStats stats)
