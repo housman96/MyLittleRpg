@@ -87,6 +87,20 @@ public class UICharacterStats : MonoBehaviour
         StartCoroutine("displayStats");
     }
 
+    public void onButtonClickHideStats()
+    {
+        StartCoroutine("hideStats");
+    }
+
+    public IEnumerator hideStats()
+    {
+        while (rectTransform.transform.position.x > -defaultX)
+        {
+            rectTransform.transform.position = Vector3.MoveTowards(rectTransform.transform.position, new Vector3(-defaultX, rectTransform.transform.position.y, rectTransform.transform.position.z), 10);
+            yield return new WaitForSeconds(0.01f);
+        }
+    }
+
     public IEnumerator displayStats()
     {
         while (rectTransform.transform.position.x < defaultX)

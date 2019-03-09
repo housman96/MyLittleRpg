@@ -8,9 +8,15 @@ public class SpriteProcessor : AssetPostprocessor
 
     void OnPreprocessTexture()
     {
-        //on set les paramètres du textureImporter
+        string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length).Insert("Assets".Length, "/Prefab");
+        string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
+
         if (assetPath.IndexOf("/TextureCharacter/") == -1)
             return;
+
+        if (Directory.Exists(pathGameObject + nameTexture + "Object.prefab"))
+            return;
+
         TextureImporter textureImporter = (TextureImporter)assetImporter;
         textureImporter.textureType = TextureImporterType.Sprite;
         textureImporter.spriteImportMode = SpriteImportMode.Multiple;
@@ -21,8 +27,13 @@ public class SpriteProcessor : AssetPostprocessor
 
     public void OnPostprocessTexture(Texture2D texture)
     {
-        //on ne découpe que les textures qui sont dans le bon dossier
+        string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length).Insert("Assets".Length, "/Prefab");
+        string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
+
         if (assetPath.IndexOf("/TextureCharacter/") == -1)
+            return;
+
+        if (Directory.Exists(pathGameObject + nameTexture + "Object.prefab"))
             return;
 
 
@@ -33,7 +44,6 @@ public class SpriteProcessor : AssetPostprocessor
             int spriteSize = 64;
             int colCount = texture.width / spriteSize;
             int rowCount = texture.height / spriteSize;
-            string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
             List<SpriteMetaData> metas = new List<SpriteMetaData>();
 
             for (int r = 0; r < rowCount; ++r)
@@ -53,7 +63,13 @@ public class SpriteProcessor : AssetPostprocessor
 
     public void OnPostprocessSprites(Texture2D texture, Sprite[] sprite)
     {
+        string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length).Insert("Assets".Length, "/Prefab");
+        string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
+
         if (assetPath.IndexOf("/TextureCharacter/") == -1)
+            return;
+
+        if (Directory.Exists(pathGameObject + nameTexture + "Object.prefab"))
             return;
 
         //on importe les sprite uniquement si on a déjà refersh
@@ -83,9 +99,7 @@ public class SpriteProcessor : AssetPostprocessor
 
                 //on crée tous les path utiles à la création des sprites
 
-                string nameTexture = Path.GetFileNameWithoutExtension(assetPath);
                 string pathFolderAnimation = (assetPath.Remove(assetPath.Length - Path.GetExtension(assetPath).Length) + "/").Insert("Assets".Length, "/Animation");
-                string pathGameObject = assetPath.Remove(assetPath.Length - Path.GetFileName(assetPath).Length).Insert("Assets".Length, "/Prefab");
                 string RelativePathFolderGameObject = Application.dataPath.Remove(Application.dataPath.Length - "Assets".Length) + pathFolderAnimation;
                 string RelativePathFolderAnimation = Application.dataPath.Remove(Application.dataPath.Length - "Assets".Length) + pathGameObject;
 
