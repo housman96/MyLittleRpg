@@ -2251,6 +2251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stats: {fileID: 0}
   rectTransform: {fileID: 224629463260558222}
+  rectAttackTransform: {fileID: 224288456473241630}
   name: {fileID: 114239191348521854}
   PV: {fileID: 114203167774952202}
   Force: {fileID: 114743696967022548}
@@ -2271,6 +2272,7 @@ MonoBehaviour:
   imageAttack3: {fileID: 114152770039767350}
   imageAttack4: {fileID: 114002577269520590}
   imageAttackDefault: {fileID: 21300000, guid: 5141bc240042a794a92e3b4a77e28772, type: 3}
+  currentAttackDisplay: {fileID: 0}
 --- !u!114 &114545823165760588
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2986,7 +2988,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114800121828751592}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114539348821379272}
+        m_MethodName: onButtonClickAttack3
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114867980913681334
@@ -3027,7 +3040,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114946963702224436}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114539348821379272}
+        m_MethodName: onButtonClickAttack2
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114877106474431630
@@ -3095,7 +3119,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114802715307291332}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114539348821379272}
+        m_MethodName: onButtonClickAttack4
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114877849424897976
@@ -3377,7 +3412,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114577047274456620}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114539348821379272}
+        m_MethodName: onButtonClickAttack1
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114988938749774444
@@ -4047,7 +4093,7 @@ RectTransform:
   - {fileID: 224448353310257912}
   - {fileID: 224573907004917650}
   m_Father: {fileID: 224190440746697960}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -4287,12 +4333,13 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 224288456473241630}
   - {fileID: 224632468876856382}
   - {fileID: 224781424565805798}
   - {fileID: 224003008737660690}
   - {fileID: 224979955496802846}
   m_Father: {fileID: 224629463260558222}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -4425,13 +4472,13 @@ RectTransform:
   m_Children:
   - {fileID: 224358256444094466}
   - {fileID: 224609715423367082}
-  m_Father: {fileID: 224629463260558222}
-  m_RootOrder: 1
+  m_Father: {fileID: 224190440746697960}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 445, y: -310}
-  m_SizeDelta: {x: -150, y: -880}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 518.5, y: -310}
+  m_SizeDelta: {x: 601, y: 199.33704}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224290253149527860
 RectTransform:
@@ -4484,7 +4531,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 54.1, y: 50.7}
+  m_AnchoredPosition: {x: 54.100006, y: 50.69995}
   m_SizeDelta: {x: -152.2, y: -161.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224368543926670720
@@ -4786,7 +4833,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224643478372582168}
-  - {fileID: 224288456473241630}
   - {fileID: 224190440746697960}
   m_Father: {fileID: 224983428395241638}
   m_RootOrder: 0
@@ -4807,7 +4853,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 224190440746697960}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -5016,7 +5062,7 @@ RectTransform:
   - {fileID: 224531606475356574}
   - {fileID: 224531924886772300}
   m_Father: {fileID: 224190440746697960}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -5221,7 +5267,7 @@ RectTransform:
   - {fileID: 224290253149527860}
   - {fileID: 224147749880351068}
   m_Father: {fileID: 224190440746697960}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
