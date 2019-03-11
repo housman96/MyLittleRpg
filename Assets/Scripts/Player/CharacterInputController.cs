@@ -171,7 +171,6 @@ public class CharacterInputController : MonoBehaviour
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("test");
         if (isInAnimation)
         {
 

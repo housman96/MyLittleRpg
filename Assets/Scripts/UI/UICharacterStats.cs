@@ -11,6 +11,10 @@ public class UICharacterStats : MonoBehaviour
 
     private float defaultX;
     private float defaultAttackX;
+
+    public Text attackName;
+    public Text attackDescription;
+
     public Text name;
     public Text PV;
     public Text Force;
@@ -33,9 +37,15 @@ public class UICharacterStats : MonoBehaviour
     public Image imageAttack3;
     public Image imageAttack4;
 
+
+    public Image jaugeInteligence;
+    public Image jaugeDext;
+
     public Sprite imageAttackDefault;
 
     public ScriptableAttacks currentAttackDisplay;
+
+    public bool isMoving = false;
 
 
     // Use this for initialization
@@ -102,17 +112,36 @@ public class UICharacterStats : MonoBehaviour
 
     public void setStats(CharacterStats stats)
     {
-        this.stats = stats;
-        StartCoroutine("displayStats");
+        if (isMoving)
+            return;
+        if (stats != this.stats)
+        {
+
+            this.stats = stats;
+            StartCoroutine("displayStats");
+        }
+        else
+        {
+
+            StartCoroutine("hideStats");
+            this.stats = null;
+        }
     }
 
     public void onButtonClickHideStats()
     {
+        if (isMoving)
+            return;
+        stats = null;
         StartCoroutine("hideStats");
     }
 
     public void onButtonClickAttack1()
     {
+        if (isMoving)
+            return;
+        if (stats == null)
+            return;
         if (currentAttackDisplay != stats.attack1)
         {
             currentAttackDisplay = stats.attack1;
@@ -124,6 +153,10 @@ public class UICharacterStats : MonoBehaviour
 
     public void onButtonClickAttack2()
     {
+        if (isMoving)
+            return;
+        if (stats == null)
+            return;
         if (currentAttackDisplay != stats.attack2)
         {
             currentAttackDisplay = stats.attack2;
@@ -135,6 +168,10 @@ public class UICharacterStats : MonoBehaviour
 
     public void onButtonClickAttack3()
     {
+        if (isMoving)
+            return;
+        if (stats == null)
+            return;
         if (currentAttackDisplay != stats.attack3)
         {
             currentAttackDisplay = stats.attack3;
@@ -146,6 +183,10 @@ public class UICharacterStats : MonoBehaviour
 
     public void onButtonClickAttack4()
     {
+        if (isMoving)
+            return;
+        if (stats == null)
+            return;
         if (currentAttackDisplay != stats.attack4)
         {
             StartCoroutine("displayAttack");
@@ -158,46 +199,66 @@ public class UICharacterStats : MonoBehaviour
 
     public IEnumerator hideStats()
     {
+        yield return new WaitUntil(() => !isMoving);
+        isMoving = true;
         while (rectTransform.position.x > -defaultX + 0.0001f || rectAttackTransform.localPosition.x > 0.0001f)
         {
-            rectTransform.position = Vector3.MoveTowards(rectTransform.position, new Vector3(-defaultX, rectTransform.position.y, rectTransform.position.z), 12);
-            rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(0, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 20);
+            rectTransform.position = Vector3.MoveTowards(rectTransform.position, new Vector3(-defaultX, rectTransform.position.y, rectTransform.position.z), 20);
+            rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(0, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 30);
             yield return new WaitForSeconds(0.01f);
 
         }
+        isMoving = false;
+        currentAttackDisplay = null;
     }
 
     public IEnumerator displayStats()
     {
+        yield return new WaitUntil(() => !isMoving);
+        isMoving = true;
         while (rectTransform.transform.position.x < defaultX - 0.0001f || rectAttackTransform.localPosition.x > 0.0001f)
         {
-            rectTransform.transform.position = Vector3.MoveTowards(rectTransform.transform.position, new Vector3(defaultX, rectTransform.transform.position.y, rectTransform.transform.position.z), 12);
-            rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(0, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 20);
+            rectTransform.transform.position = Vector3.MoveTowards(rectTransform.transform.position, new Vector3(defaultX, rectTransform.transform.position.y, rectTransform.transform.position.z), 20);
+            rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(0, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 30);
             yield return new WaitForSeconds(0.01f);
         }
+        isMoving = false;
     }
 
     public IEnumerator displayAttack()
     {
-        while (rectTransform.transform.position.x < defaultX - 0.0001f || rectAttackTransform.localPosition.x < defaultAttackX - 0.0001f)
+        yield return new WaitUntil(() => !isMoving);
+        if (currentAttackDisplay != null)
         {
-            rectTransform.transform.position = Vector3.MoveTowards(rectTransform.transform.position, new Vector3(defaultX, rectTransform.transform.position.y, rectTransform.transform.position.z), 12);
-            rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(defaultAttackX, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 20);
-            yield return new WaitForSeconds(0.01f);
+            isMoving = true;
+
+            jaugeDext.fillAmount = currentAttackDisplay.dextFactor + currentAttackDisplay.intFactor;
+            jaugeInteligence.fillAmount = currentAttackDisplay.intFactor;
+
+            attackName.text = currentAttackDisplay.name;
+            attackDescription.text = currentAttackDisplay.description;
+
+            while (rectTransform.transform.position.x < defaultX - 0.0001f || rectAttackTransform.localPosition.x < defaultAttackX - 0.0001f)
+            {
+                rectTransform.transform.position = Vector3.MoveTowards(rectTransform.transform.position, new Vector3(defaultX, rectTransform.transform.position.y, rectTransform.transform.position.z), 20);
+                rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(defaultAttackX, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 30);
+                yield return new WaitForSeconds(0.01f);
+            }
+            isMoving = false;
         }
     }
 
     public IEnumerator HideAttack()
     {
-        Debug.Log("hide attack");
+        yield return new WaitUntil(() => !isMoving);
+        isMoving = true;
         currentAttackDisplay = null;
         while (rectTransform.transform.position.x < defaultX - 0.0001f || rectAttackTransform.localPosition.x > 0.0001f)
         {
-            rectTransform.transform.position = Vector3.MoveTowards(rectTransform.transform.position, new Vector3(defaultX, rectTransform.transform.position.y, rectTransform.transform.position.z), 12);
-            rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(0, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 20);
+            rectTransform.transform.position = Vector3.MoveTowards(rectTransform.transform.position, new Vector3(defaultX, rectTransform.transform.position.y, rectTransform.transform.position.z), 20);
+            rectAttackTransform.localPosition = Vector3.MoveTowards(rectAttackTransform.localPosition, new Vector3(0, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z), 30);
             yield return new WaitForSeconds(0.01f);
         }
-
-        Debug.Log("fin hide attack");
+        isMoving = false;
     }
 }

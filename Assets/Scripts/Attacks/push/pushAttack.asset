@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Name: pushAttack
   m_EditorClassIdentifier: 
   imageAttack: {fileID: 21300000, guid: 1eda110ea8abd5845b6fd8a4369b6d5e, type: 3}
+  name: Push Attack
+  description: Mash the left mouse button the fastest you can to hit your enemy.
   attackName: Push
   distanceMin: 3
-  forceFactor: 0.9
+  forceFactor: 0.85
   dextFactor: 0.1
-  intFactor: 0
+  intFactor: 0.05
   forceCost: 2
   dextCost: 2
   intCost: 2
