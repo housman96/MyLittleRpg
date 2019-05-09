@@ -34,6 +34,12 @@ public class CharacterInputController : MonoBehaviour
 
         float lastUpdateDeltaTime = (Time.time - lastTime);
 
+        if (Input.GetButton("e"))
+        {
+            animationController.sword(1, 1);
+        }
+
+
         //si on est dans une animation
         if (isInAnimation)
         {
@@ -44,6 +50,7 @@ public class CharacterInputController : MonoBehaviour
 
             Vector3 newPositon = Vector3.MoveTowards(transform.position, targetAnimation, step);
             Vector2 translation = newPositon - transform.position;
+
 
             if (Mathf.Abs(translation.x) > Mathf.Abs(translation.y))
             {

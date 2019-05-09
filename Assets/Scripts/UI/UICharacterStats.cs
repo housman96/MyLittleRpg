@@ -4,17 +4,24 @@ using UnityEngine.UI;
 
 public class UICharacterStats : MonoBehaviour
 {
+    /*Variables CharacterStats*/
+    private CharacterStats stats;                //stats du personnage selectionné
 
-    public CharacterStats stats;
-    public RectTransform rectTransform;
-    public RectTransform rectAttackTransform;
+    /*Variables RectTransform*/
+    public RectTransform rectTransform;         //RectTransform qui contient tous les objets du pannel principal
+    public RectTransform rectAttackTransform;   //RectTransform qui contient la description des attaques
 
-    private float defaultX;
-    private float defaultAttackX;
+    /*Variables float*/
+    private float defaultX;                     //offset par default de rectTransform
+    private float defaultAttackX;               //offset par default de rectAttackTransform
 
+
+    /*Variables Text*/
+    //text attack
     public Text attackName;
     public Text attackDescription;
 
+    //text dexctiption personnage 
     public Text name;
     public Text PV;
     public Text Force;
@@ -24,6 +31,8 @@ public class UICharacterStats : MonoBehaviour
     public Text ResDext;
     public Text ResInt;
 
+    /*Variables Image*/
+    //jauges carac
     public Image PVMask;
     public Image ForceMask;
     public Image DextMask;
@@ -32,25 +41,31 @@ public class UICharacterStats : MonoBehaviour
     public Image ResDextMask;
     public Image ResIntMask;
 
+    //image attacks
     public Image imageAttack1;
     public Image imageAttack2;
     public Image imageAttack3;
     public Image imageAttack4;
 
-
+    //jauge attack
     public Image jaugeInteligence;
     public Image jaugeDext;
 
+    //image attack par default
     public Sprite imageAttackDefault;
 
-    public ScriptableAttacks currentAttackDisplay;
+    /*Variables ScriptableAttacks*/
 
+    public ScriptableAttacks currentAttackDisplay;       //stats attaque actuellement affichée
+
+    /*Variables Bool*/
     public bool isMoving = false;
 
 
     // Use this for initialization
     void Start()
     {
+        //on récupére les offset et on set la position initial des pannels
         defaultAttackX = rectAttackTransform.localPosition.x;
         rectAttackTransform.localPosition = new Vector3(0, rectAttackTransform.localPosition.y, rectAttackTransform.localPosition.z);
 
@@ -62,64 +77,71 @@ public class UICharacterStats : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (stats == null)
-            return;
-        name.text = stats.name;
-        PV.text = stats.currentPV + "/" + stats.PV;
-        Force.text = stats.currentForce + "/" + stats.force;
-        Dext.text = stats.currentDext + "/" + stats.dext;
-        Int.text = stats.currentIntel + "/" + stats.intel;
-        ResForce.text = stats.resForce.ToString();
-        ResDext.text = stats.resDext.ToString();
-        ResInt.text = stats.resIntel.ToString();
 
-        PVMask.fillAmount = (float)stats.currentPV / (float)stats.PV;
-        ForceMask.fillAmount = (float)stats.currentForce / (float)stats.force;
-        DextMask.fillAmount = (float)stats.currentDext / (float)stats.dext;
-        IntMask.fillAmount = (float)stats.currentIntel / (float)stats.intel;
-
-        if (stats.attack1 != null)
-        {
-            imageAttack1.sprite = stats.attack1.imageAttack;
-        }
-        else
-        {
-            imageAttack1.GetComponentInParent<Button>().interactable = false;
-            imageAttack1.sprite = imageAttackDefault;
-        }
-        if (stats.attack2 != null)
-            imageAttack2.sprite = stats.attack2.imageAttack;
-        else
-        {
-            imageAttack2.GetComponentInParent<Button>().interactable = false;
-            imageAttack2.sprite = imageAttackDefault;
-        }
-        if (stats.attack3 != null)
-            imageAttack3.sprite = stats.attack3.imageAttack;
-        else
-        {
-            imageAttack3.GetComponentInParent<Button>().interactable = false;
-            imageAttack3.sprite = imageAttackDefault;
-        }
-        if (stats.attack4 != null)
-            imageAttack4.sprite = stats.attack4.imageAttack;
-        else
-        {
-            imageAttack4.GetComponentInParent<Button>().interactable = false;
-            imageAttack4.sprite = imageAttackDefault;
-        }
     }
+
 
     public void setStats(CharacterStats stats)
     {
+        //si le panel est déjà en mouvement on ne set pas la variable stats
         if (isMoving)
             return;
+
+        //si stats est différent de l'actuel stats on refresh les valeurs du panel
         if (stats != this.stats)
         {
-
-            this.stats = stats;
             StartCoroutine("displayStats");
+
+            if (stats != null)
+            {
+                this.stats = stats;
+                name.text = stats.name;
+                PV.text = stats.currentPV + "/" + stats.PV;
+                Force.text = stats.currentForce + "/" + stats.force;
+                Dext.text = stats.currentDext + "/" + stats.dext;
+                Int.text = stats.currentIntel + "/" + stats.intel;
+                ResForce.text = stats.resForce.ToString();
+                ResDext.text = stats.resDext.ToString();
+                ResInt.text = stats.resIntel.ToString();
+
+                PVMask.fillAmount = (float)stats.currentPV / (float)stats.PV;
+                ForceMask.fillAmount = (float)stats.currentForce / (float)stats.force;
+                DextMask.fillAmount = (float)stats.currentDext / (float)stats.dext;
+                IntMask.fillAmount = (float)stats.currentIntel / (float)stats.intel;
+
+                if (stats.attack1 != null)
+                {
+                    imageAttack1.sprite = stats.attack1.imageAttack;
+                }
+                else
+                {
+                    imageAttack1.GetComponentInParent<Button>().interactable = false;
+                    imageAttack1.sprite = imageAttackDefault;
+                }
+                if (stats.attack2 != null)
+                    imageAttack2.sprite = stats.attack2.imageAttack;
+                else
+                {
+                    imageAttack2.GetComponentInParent<Button>().interactable = false;
+                    imageAttack2.sprite = imageAttackDefault;
+                }
+                if (stats.attack3 != null)
+                    imageAttack3.sprite = stats.attack3.imageAttack;
+                else
+                {
+                    imageAttack3.GetComponentInParent<Button>().interactable = false;
+                    imageAttack3.sprite = imageAttackDefault;
+                }
+                if (stats.attack4 != null)
+                    imageAttack4.sprite = stats.attack4.imageAttack;
+                else
+                {
+                    imageAttack4.GetComponentInParent<Button>().interactable = false;
+                    imageAttack4.sprite = imageAttackDefault;
+                }
+            }
         }
+        //sinon on cache le panel
         else
         {
 
